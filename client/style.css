@@ -1,4 +1,24 @@
-#game {
+body {
+    background-color: #222222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+#main-column {
+    background-color: #1a1a1a;
+    width: 700px;
+    min-height: 100vh;
+}
+
+.container {
+    display: block;
+    margin: 0 auto;
+}
+
+#game-container {
+    margin-top: 20px;
     width: 640px;
     height: 480px;
     position: relative;
@@ -9,15 +29,16 @@ canvas {
     width: 100%;
     height: 100%;
     position: absolute;
+    overflow: hidden;
 }
 
 #ui {
     pointer-events: none;
 }
 
-.chatBubble {
+.chat-bubble {
     position: absolute;
     transform: translate(-50%, -120%);
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
 }
