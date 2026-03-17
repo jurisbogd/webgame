@@ -1,10 +1,5 @@
 //Set this to address of server before running client
-const serverAddress = undefined
-
-if (!serverAddress) {
-    console.error('no server address given')
-    return
-}
+const serverAddress = 'localhost'
 
 const canvas = document.getElementById('canvas-2d');
 const ctx = canvas.getContext('2d');
