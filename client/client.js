@@ -1,26 +1,22 @@
+import { Server } from './Server.js'
+
 //Set this to address of server before running client
 const serverAddress = 'localhost'
+const port = 10799
 
 const canvas = document.getElementById('canvas-2d');
 const ctx = canvas.getContext('2d');
-const server = new WebSocket(`ws://${serverAddress}:10799`)
-const serverPackets = []
+// const server = new WebSocket(`ws://${serverAddress}:10799`)
 const players = new Map()
 const input = {}
 const ui = document.getElementById('ui')
-const chatInput = document.getElementById('chatInput')
+const chatInput = document.getElementById('chat-input')
+
+const server = new Server(serverAddress, port)
 
 let myId
 let packetToBeSent
 let pendingChatMessage
-
-server.onopen = () => console.log('connected to server')
-//TODO validation on incoming packets
-server.onmessage = message => serverPackets.push(JSON.parse(message.data))
-//TODO proper WebSocket error handling
-server.onerror = error => console.error(error)
-//Doesn't do anything on close
-server.onclose = () => console.log('disconnected from server')
 
 canvas.onkeydown = (event) => input[event.code] = true
 canvas.onkeyup = (event) => input[event.code] = false
@@ -54,7 +50,7 @@ function step() {
     updatePlayer()
 
     if (packetToBeSent.events.length > 0) {
-        server.send(JSON.stringify(packetToBeSent))
+        server.connection.send(JSON.stringify(packetToBeSent))
     }
 
     clearCanvas('cornflowerblue')
@@ -63,7 +59,7 @@ function step() {
 
 function consumeServerPackets() {
     //Consume packets from server
-    for (const packet of serverPackets) {
+    for (const packet of server.receivedPackets) {
         for (const event of packet.events) {
             console.log(`received event with tag ${event.tag}`);
             switch (event.tag) {
@@ -82,7 +78,7 @@ function consumeServerPackets() {
                 case 'newPlayer': {
                     const chatBubble = document.createElement('div')
                     chatBubble.id = `chat_${event.id}`
-                    chatBubble.className = 'chatBubble'
+                    chatBubble.className = 'chat-bubble'
                     chatBubble.style.display = 'none'
                     ui.appendChild(chatBubble)
                     const player = {
@@ -114,9 +110,9 @@ function consumeServerPackets() {
                 }
             }
         }
-    } ``
+    }
 
-    serverPackets.length = 0
+    server.receivedPackets.length = 0
 }
 
 function updatePlayer() {
