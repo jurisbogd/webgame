@@ -1,20 +1,24 @@
-export class Server {
-    connection
-    receivedPackets = []
+const received = []
 
-    constructor(address, port) {
-        const url = `ws://${address}:${port}`
-        const connection = new WebSocket(url)
+export async function init_server(url) {
+    const ws = await connect(url)
 
-        connection.onopen = () => console.log(`connected to server at ${connection.url}`)
-        connection.onmessage = message => {
-            const json = message.data
-            const packet = JSON.parse(json)
-            this.receivedPackets.push(packet)
-        }
-        connection.onerror = error => console.error(error)
-        connection.onclose = () => console.log(`disconnected from server at ${connection.url}`)
-
-        this.connection = connection
+    ws.onerror = (error) => {
+        console.error(error)
     }
+
+    return { ws, received }
+}
+
+async function connect(url) {
+    const ws = new WebSocket(url)
+    ws.onmessage = (message) => {
+        const json = message.data
+        const packet = JSON.parse(json)
+        received.push(packet)
+    }
+    return new Promise((resolve, reject) => {
+        ws.onopen = () => resolve(ws)
+        ws.onerror = (err) => reject(err)
+    })
 }

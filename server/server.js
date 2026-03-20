@@ -16,19 +16,22 @@ let nextEntityId = 0
 server.on('connection', (connection) => {
     console.log('new connection')
 
+    const id = nextEntityId
+    nextEntityId += 1
+
     const player = {
         connection: connection,
         x: Math.random() * map.width,
         y: Math.random() * map.height,
     }
 
-    const id = nextEntityId
     players.set(id, player)
-    nextEntityId += 1
-
-    newPlayers.push({ tag: 'newPlayer', id: id, x: player.x, y: player.y })
 
     sendInitializationPacket(connection, id)
+
+    newPlayers.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
+
+    // packetToBeSent.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
 
     connection.onmessage = message => {
         const packet = JSON.parse(message.data)
@@ -45,12 +48,15 @@ function run() {
 }
 
 function sendInitializationPacket(connection, id) {
+    console.log('sending initialization packet')
     const packet = { events: [] }
-    packet.events.push({ tag: 'setId', id: id })
+    packet.events.push({ tag: 'SET_PLAYER_ID', id: id })
     for (const [id, player] of players) {
-        packet.events.push({ tag: 'newPlayer', id: id, x: player.x, y: player.y })
+        packet.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
     }
+    const json = JSON.stringify(packet)
     connection.send(JSON.stringify(packet))
+    console.log(json)
 }
 
 let packetToBeSent
@@ -68,25 +74,43 @@ function step() {
     transmitToAllClients()
 }
 
+const network_event_handlers = {
+    SET_POSITION: (event) => {
+        //Update player position
+        const player = players.get(packet.sender)
+        if (!player) return
+        player.x = event.x
+        player.y = event.y
+        //Retransmit to all players
+        const set_position_event = { tag: 'SET_POSITION', id: packet.sender, x: event.x, y: event.y }
+        packetToBeSent.events.push(set_position_event)
+    },
+    CHAT_MESSAGE: (event) => {
+        console.log(`got chat message: ${event.message}`)
+        const chat_message_event = { tag: 'CHAT_MESSAGE', id: packet.sender, message: event.message }
+        packetToBeSent.events.push(chat_message_event)
+    },
+}
+
 function consumeClientPackets() {
     for (const packet of packetsFromClients) {
         for (const event of packet.events) {
             switch (event.tag) {
-                case 'setPosition': {
+                case 'SET_POSITION': {
                     //Update player position
                     const player = players.get(packet.sender)
                     if (!player) break
                     player.x = event.x
                     player.y = event.y
                     //Retransmit to all players
-                    const setPositionEvent = { tag: 'setPosition', id: packet.sender, x: event.x, y: event.y }
-                    packetToBeSent.events.push(setPositionEvent)
+                    const set_position_event = { tag: 'SET_POSITION', id: packet.sender, x: event.x, y: event.y }
+                    packetToBeSent.events.push(set_position_event)
                     break
                 }
-                case 'chatMessage': {
+                case 'CHAT_MESSAGE': {
                     console.log(`got chat message: ${event.message}`)
-                    const chatMessageEvent = { tag: 'chatMessage', id: packet.sender, message: event.message }
-                    packetToBeSent.events.push(chatMessageEvent)
+                    const chat_message_event = { tag: 'CHAT_MESSAGE', id: packet.sender, message: event.message }
+                    packetToBeSent.events.push(chat_message_event)
                     break
                 }
                 default: {
@@ -106,7 +130,7 @@ function flushplayersToBeDeleted() {
         const id = playersToBeDeleted.pop()
         players.delete(id)
         //Transmit deletePlayer event to all clients
-        const event = { tag: 'deletePlayer', id: id }
+        const event = { tag: 'DELETE_PLAYER', id: id }
         packetToBeSent.events.push(event)
     }
 }

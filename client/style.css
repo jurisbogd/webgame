@@ -1,4 +1,5 @@
 body {
+    font: 12pt "Verdana", sans-serif;
     background-color: #222222;
     display: flex;
     align-items: center;
@@ -15,6 +16,7 @@ body {
 .container {
     display: block;
     margin: 0 auto;
+    margin-bottom: 20px;
 }
 
 #game-container {
@@ -32,6 +34,11 @@ canvas {
     overflow: hidden;
 }
 
+canvas:focus {
+    outline: none;
+    /* box-shadow: none; */
+}
+
 #ui {
     pointer-events: none;
 }
@@ -40,5 +47,23 @@ canvas {
     position: absolute;
     transform: translate(-50%, -120%);
     background-color: rgba(0, 0, 0, 0.5);
+    text-wrap-mode: nowrap;
     color: white;
+}
+
+#chat-container {
+    width: 50%;
+}
+
+#chat-input {
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid gray;
+    background-color: transparent;
+    color: white;
+    font: inherit;
+}
+
+#chat-input:focus {
+    outline: 2px solid lightblue;
 }

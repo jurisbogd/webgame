@@ -1,31 +1,42 @@
-import { Server } from './Server.js'
+import { init_server } from './server.js'
+import { queue_event, flush_events } from './event_queue.js';
+import { network_event_handlers } from './network_event_handlers.js'
+import { render_chat_bubbles } from './render_chat_bubbles.js';
+import { init_keyboard_input, update_keyboard_input, is_key_pressed } from './keyboard_input.js'
+import { update_player } from './player.js';
+import { render_entities } from './render_entities.js';
 
-//Set this to address of server before running client
-const serverAddress = 'localhost'
+// set this to address and port of server before running client
+const server_address = 'localhost'
 const port = 10799
+const server = await init_server(`ws://${server_address}:${port}`)
 
 const canvas = document.getElementById('canvas-2d');
 const ctx = canvas.getContext('2d');
-// const server = new WebSocket(`ws://${serverAddress}:10799`)
-const players = new Map()
-const input = {}
+const entities = new Map()
 const ui = document.getElementById('ui')
-const chatInput = document.getElementById('chat-input')
+const chat_input = document.getElementById('chat-input')
 
-const server = new Server(serverAddress, port)
+init_keyboard_input(canvas)
 
-let myId
-let packetToBeSent
-let pendingChatMessage
+const game = {
+    player_id: undefined,
+    entities: entities,
+    server: server,
+    ui: ui,
+    ctx: ctx,
+}
 
-canvas.onkeydown = (event) => input[event.code] = true
-canvas.onkeyup = (event) => input[event.code] = false
-
-chatInput.onkeydown = (event) => {
+chat_input.onkeydown = (event) => {
     if (event.code === 'Enter') {
-        const message = chatInput.value
-        pendingChatMessage = message
-        chatInput.value = ''
+        const message = chat_input.value
+
+        if (message != '') {
+            queue_event({ tag: 'CHAT_MESSAGE', message: message })
+            chat_input.value = ''
+        }
+
+        canvas.focus()
     }
 }
 
@@ -35,139 +46,45 @@ function run() {
 }
 
 function step() {
-    packetToBeSent = { events: [] }
+    if (is_key_pressed('Enter')) chat_input.focus()
 
-    if (pendingChatMessage) {
-        const event = {
-            tag: 'chatMessage',
-            message: pendingChatMessage,
-        }
-        packetToBeSent.events.push(event)
-        pendingChatMessage = undefined
-    }
+    consume_server_packets(game)
+    update_player(game)
 
-    consumeServerPackets()
-    updatePlayer()
+    // send all buffered network events to server
+    flush_events(game.server.ws)
 
-    if (packetToBeSent.events.length > 0) {
-        server.connection.send(JSON.stringify(packetToBeSent))
-    }
+    // rendering
+    clear_canvas()
+    render_entities(game)
+    render_chat_bubbles(game)
 
-    clearCanvas('cornflowerblue')
-    renderPlayers()
+    update_keyboard_input()
 }
 
-function consumeServerPackets() {
+function consume_server_packets(game) {
     //Consume packets from server
-    for (const packet of server.receivedPackets) {
+    for (const packet of game.server.received) {
         for (const event of packet.events) {
             console.log(`received event with tag ${event.tag}`);
-            switch (event.tag) {
-                case 'setId': {
-                    myId = event.id
-                    break
-                }
-                case 'setPosition': {
-                    const player = players.get(event.id)
-                    if (!player) break
-                    if (event.id === myId) break
-                    player.x = event.x
-                    player.y = event.y
-                    break
-                }
-                case 'newPlayer': {
-                    const chatBubble = document.createElement('div')
-                    chatBubble.id = `chat_${event.id}`
-                    chatBubble.className = 'chat-bubble'
-                    chatBubble.style.display = 'none'
-                    ui.appendChild(chatBubble)
-                    const player = {
-                        x: event.x,
-                        y: event.y,
-                        chatMessage: undefined,
-                        chatBubble: chatBubble,
-                    }
-                    players.set(event.id, player)
-                    break
-                }
-                case 'deletePlayer': {
-                    players.delete(event.id)
-                    break
-                }
-                case 'chatMessage': {
-                    console.log(`got chat message: ${event.message}`)
-                    const chatMessage = {
-                        timestamp: performance.now(),
-                    }
-                    const player = players.get(event.id)
-                    player.chatMessage = chatMessage
-                    player.chatBubble.innerText = event.message
-                    break
-                }
-                default: {
-                    console.log(`packet with unknown event tag ${event.tag} received from server`)
-                    break
-                }
+
+            const event_handler = network_event_handlers[event.tag]
+
+            if (event_handler) {
+                event_handler(game, event)
+            }
+            else {
+                console.log(`packet with unknown event tag ${event.tag} received`)
             }
         }
     }
 
-    server.receivedPackets.length = 0
+    game.server.received.length = 0
 }
 
-function updatePlayer() {
-    const player = players.get(myId)
-    if (!player) return
-
-    let velocityX = 0
-    let velocityY = 0
-    if (isKeyDown('KeyW')) velocityY -= 2
-    if (isKeyDown('KeyA')) velocityX -= 2
-    if (isKeyDown('KeyS')) velocityY += 2
-    if (isKeyDown('KeyD')) velocityX += 2
-
-    if (velocityX !== 0 || velocityY !== 0) {
-        player.x += velocityX
-        player.y += velocityY
-        const event = { tag: 'setPosition', x: player.x, y: player.y, }
-        packetToBeSent.events.push(event)
-    }
-}
-
-function isKeyDown(key) {
-    return !!input[key]
-}
-
-function clearCanvas(clearColor) {
-    ctx.fillStyle = clearColor
+function clear_canvas(color = 'cornflowerblue') {
+    ctx.fillStyle = color
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-}
-
-function renderPlayers() {
-    for (const [id, player] of players) {
-        ctx.fillStyle = id === myId ? 'red' : 'blue'
-        ctx.beginPath()
-        ctx.ellipse(player.x, player.y, 16, 16, 0, 0, Math.PI * 2)
-        ctx.fill()
-
-        const chatMessage = player.chatMessage
-        const now = performance.now()
-        if (chatMessage && (now - chatMessage.timestamp) < 5000) {
-            const myPlayer = players.get(myId)
-            const dx = player.x - myPlayer.x
-            const dy = player.y - myPlayer.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-            if (distance < 100) {
-                const chatBubble = player.chatBubble
-                chatBubble.style.display = 'block'
-                chatBubble.style.left = `${player.x}px`
-                chatBubble.style.top = `${player.y}px`
-                continue
-            }
-        }
-
-        player.chatBubble.style.display = 'none'
-    }
 }
 
 run()
