@@ -3,7 +3,7 @@ import { queue_event, flush_events } from './event_queue.js';
 import { network_event_handlers } from './network_event_handlers.js'
 import { render_chat_bubbles } from './render_chat_bubbles.js';
 import { init_keyboard_input, update_keyboard_input, is_key_pressed } from './keyboard_input.js'
-import { update_player } from './player.js';
+import { get_player, update_player } from './player.js';
 import { render_entities } from './render_entities.js';
 import { load_image } from './load_image.js'
 
@@ -62,6 +62,7 @@ function step() {
     clear_canvas()
     draw_background()
     render_entities(game)
+    highlight_player(game)
     render_chat_bubbles(game)
 
     update_keyboard_input()
@@ -94,6 +95,22 @@ function clear_canvas(color = 'cornflowerblue') {
 
 function draw_background() {
     ctx.drawImage(background_image, 0, 0, canvas.width, canvas.height)
+}
+
+function highlight_player(game) {
+    const player = get_player(game)
+
+    if (!player) return
+
+    const position = player.position
+
+    if (position === undefined) return
+
+    game.ctx.strokeStyle = 'orangered'
+    game.ctx.lineWidth = 4
+    game.ctx.beginPath()
+    game.ctx.ellipse(position.x, position.y, 16, 16, 0, 0, Math.PI * 2)
+    game.ctx.stroke()
 }
 
 run()

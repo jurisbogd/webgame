@@ -6,9 +6,9 @@ export function render_entities(game) {
 
         if (position === undefined) continue
 
-        const color = entity_id === get_player_id(game)
-            ? 'red'
-            : 'blue'
+        const color = entity.color === undefined
+            ? 'black'
+            : entity.color
 
         game.ctx.fillStyle = color
         game.ctx.beginPath()

@@ -25,8 +25,13 @@ function set_position_handler(game, event) {
 }
 
 function new_entity_handler(game, event) {
-    const entity = {
-        position: { x: event.x, y: event.y },
+    const entity = {}
+
+    const position = { x: event.x, y: event.y }
+    entity.position = position
+
+    if (event.color !== undefined) {
+        entity.color = event.color
     }
 
     game.entities.set(event.id, entity)
