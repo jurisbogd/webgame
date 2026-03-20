@@ -3,7 +3,7 @@ import { set_player_id, get_player_id } from "./player.js"
 export const network_event_handlers = {
     SET_PLAYER_ID: set_player_id_handler,
     SET_POSITION: set_position_handler,
-    NEW_PLAYER: new_player_handler,
+    NEW_ENTITY: new_entity_handler,
     DELETE_PLAYER: delete_player_handler,
     CHAT_MESSAGE: chat_message_handler,
 }
@@ -24,12 +24,12 @@ function set_position_handler(game, event) {
     entity.position = { x: event.x, y: event.y }
 }
 
-function new_player_handler(game, event) {
-    const player = {
+function new_entity_handler(game, event) {
+    const entity = {
         position: { x: event.x, y: event.y },
     }
 
-    game.entities.set(event.id, player)
+    game.entities.set(event.id, entity)
 }
 
 function delete_player_handler(game, event) {

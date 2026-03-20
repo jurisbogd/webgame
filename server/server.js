@@ -58,7 +58,7 @@ server.on('connection', (connection) => {
 
     sendInitializationPacket(connection, id)
 
-    newPlayers.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
+    newPlayers.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
 
     // packetToBeSent.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
 
@@ -85,10 +85,10 @@ function sendInitializationPacket(connection, id) {
 
         if (position === undefined) continue
 
-        packet.events.push({ tag: 'NEW_PLAYER', id: entity_id, x: position.x, y: position.y })
+        packet.events.push({ tag: 'NEW_ENTITY', id: entity_id, x: position.x, y: position.y })
     }
     for (const [id, player] of players) {
-        packet.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
+        packet.events.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
     }
     const json = JSON.stringify(packet)
     connection.send(JSON.stringify(packet))
