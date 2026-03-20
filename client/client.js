@@ -5,11 +5,15 @@ import { render_chat_bubbles } from './render_chat_bubbles.js';
 import { init_keyboard_input, update_keyboard_input, is_key_pressed } from './keyboard_input.js'
 import { update_player } from './player.js';
 import { render_entities } from './render_entities.js';
+import { load_image } from './load_image.js'
 
 // set this to address and port of server before running client
 const server_address = 'localhost'
 const port = 10799
 const server = await init_server(`ws://${server_address}:${port}`)
+
+const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
+const background_image = await load_image(background_image_url)
 
 const canvas = document.getElementById('canvas-2d');
 const ctx = canvas.getContext('2d');
@@ -56,6 +60,7 @@ function step() {
 
     // rendering
     clear_canvas()
+    draw_background()
     render_entities(game)
     render_chat_bubbles(game)
 
@@ -85,6 +90,10 @@ function consume_server_packets(game) {
 function clear_canvas(color = 'cornflowerblue') {
     ctx.fillStyle = color
     ctx.fillRect(0, 0, canvas.width, canvas.height)
+}
+
+function draw_background() {
+    ctx.drawImage(background_image, 0, 0, canvas.width, canvas.height)
 }
 
 run()
