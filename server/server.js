@@ -1,5 +1,6 @@
 import { WebSocketServer } from 'ws'
 import { push_event, flush_events } from './network_event_buffer.js'
+import { select_random } from './select_random.js'
 
 const port = 10799
 const server = new WebSocketServer({ port: port })
@@ -21,7 +22,9 @@ const game = {
     bouncers: bouncers,
 }
 
-for (let i = 0; i < 10; i += 1) {
+const possible_colors = ['rebeccapurple', 'blue', 'seagreen', 'springgreen', 'forestgreen']
+
+for (let i = 0; i < 20; i += 1) {
     const bouncer = {}
 
     const x = Math.random() * map.width
@@ -37,6 +40,10 @@ for (let i = 0; i < 10; i += 1) {
     const velocity = { x: velocityX, y: velocityY }
 
     bouncer.velocity = velocity
+
+    const color = select_random(possible_colors)
+
+    bouncer.color = color
 
     game.bouncers.set(nextEntityId, bouncer)
     nextEntityId += 1
@@ -82,10 +89,11 @@ function sendInitializationPacket(connection, id) {
     packet.events.push({ tag: 'SET_PLAYER_ID', id: id })
     for (const [entity_id, entity] of bouncers) {
         const position = entity.position
+        const color = entity.color
 
-        if (position === undefined) continue
+        if (position === undefined || color === undefined) continue
 
-        packet.events.push({ tag: 'NEW_ENTITY', id: entity_id, x: position.x, y: position.y, color: 'blue' })
+        packet.events.push({ tag: 'NEW_ENTITY', id: entity_id, x: position.x, y: position.y, color: entity.color })
     }
     for (const [id, player] of players) {
         packet.events.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y, color: 'aqua' })
