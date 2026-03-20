@@ -9,5 +9,8 @@
         "start": "node server.js"
     },
     "author": "",
-    "license": "ISC"
+    "license": "ISC",
+    "dependencies": {
+        "ws": "^8.19.0"
+    }
 }
