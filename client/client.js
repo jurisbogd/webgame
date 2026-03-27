@@ -5,7 +5,7 @@ import { render_chat_bubbles } from './render_chat_bubbles.js';
 import { init_keyboard_input, update_keyboard_input, is_key_pressed } from './keyboard_input.js'
 import { get_player, update_player } from './player.js';
 import { render_entities } from './render_entities.js';
-import { load_image } from './load_image.js'
+import { load_image_url } from './load_image.js'
 import { init_graphics_crc2d } from './graphics_crc2d.js';
 
 // set this to address and port of server before running client
@@ -14,7 +14,7 @@ const port = 10799
 const server = await init_server(`ws://${server_address}:${port}`)
 
 const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
-const background_image = await load_image(background_image_url)
+const background_image = await load_image_url(background_image_url)
 
 const graphics = await init_graphics_crc2d()
 
