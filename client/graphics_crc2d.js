@@ -1,4 +1,4 @@
-export async function init_graphics() {
+export async function init_graphics_crc2d() {
     return new Promise((resolve) => {
         const graphics = new Graphics()
         resolve(graphics)
