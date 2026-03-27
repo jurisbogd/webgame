@@ -10,9 +10,6 @@ export function render_entities(game) {
             ? 'black'
             : entity.color
 
-        game.ctx.fillStyle = color
-        game.ctx.beginPath()
-        game.ctx.ellipse(position.x, position.y, 16, 16, 0, 0, Math.PI * 2)
-        game.ctx.fill()
+        game.graphics.draw_filled_circle(position.x, position.y, 16, color)
     }
 }
