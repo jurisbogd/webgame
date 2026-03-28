@@ -7,4 +7,8 @@ export class Tile {
         this.tileset = tileset;
         this.id = id;
     }
+
+    static default() {
+        return new Tile(undefined, -1);
+    }
 }

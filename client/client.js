@@ -9,6 +9,9 @@ import { load_image, load_image_url, load_tileset } from './load_image.js'
 import { init_graphics_crc2d } from './graphics_crc2d.js';
 import { Draw } from "./Draw.js";
 import { Tilemap } from './Tilemap.js';
+import { Tile } from './Tile.js'
+import { generate_map } from './generate_map.js';
+import { init_2d_array } from './init_2d_array.js';
 
 // set this to address and port of server before running client
 const server_address = 'localhost'
@@ -48,7 +51,21 @@ class Game {
         game.tileset = await load_tileset('tileset_basic');
         game.player_sprite = await load_image('red_orb32');
 
-        game.tilemap = Tilemap.randomized(16, 16, game.tileset);
+        // game.tilemap = Tilemap.randomized(16, 16, game.tileset);
+        const wallmap = generate_map(0, 0);
+        const width = wallmap.length;
+        const height = wallmap[0].length;
+        const tilemap = new Tilemap(width, height);
+
+        for (let i = 0; i < width; ++i) {
+            for (let j = 0; j < height; ++j) {
+                const tile = tilemap.get_tile(i, j);
+                tile.id = wallmap[i][j];
+                tile.tileset = game.tileset;
+            }
+        }
+
+        game.tilemap = tilemap;
 
         init_keyboard_input(game.canvas)
 

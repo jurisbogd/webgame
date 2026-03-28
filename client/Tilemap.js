@@ -1,17 +1,15 @@
+import { init_2d_array } from './init_2d_array.js';
 import { Tile } from './Tile.js';
 
 export class Tilemap {
-    tiles = [];
+    tiles;
     width;
     height;
 
     constructor(width, height) {
         this.width = width;
         this.height = height;
-
-        for (let i = 0; i < width * height; i++) {
-            this.tiles.push(new Tile(undefined, -1));
-        }
+        this.tiles = init_2d_array(width, height, Tile.default);
     }
 
     static randomized(width, height, tileset) {
@@ -31,6 +29,6 @@ export class Tilemap {
     }
 
     get_tile(i, j) {
-        return this.tiles[i + j * this.width];
+        return this.tiles[i][j];
     }
 }
