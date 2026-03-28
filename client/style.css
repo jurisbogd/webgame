@@ -50,8 +50,9 @@ canvas:focus {
     overflow-wrap: break-word;
     word-break: break-word;
     text-align: center;
+    width: max-content;
+    flex-shrink: 0;
     max-width: 200px;
-    min-width: 200px;
     color: white;
 }
 
