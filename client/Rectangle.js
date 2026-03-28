@@ -11,6 +11,15 @@ export class Rectangle {
         this.height = height
     }
 
+    contains(rectangle) {
+        return !(
+            this.get_bottom() < rectangle.get_top() ||
+            this.get_top() > rectangle.get_bottom() ||
+            this.get_right() < rectangle.get_left() ||
+            this.get_left() > rectangle.get_right()
+        )
+    }
+
     get_x() {
         return this.x
     }
