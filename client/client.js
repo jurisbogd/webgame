@@ -94,7 +94,6 @@ function draw_tilemap(game) {
 
             const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
             game.graphics.render(draw)
-            // game.graphics.draw_tile(tileset, tile_id, i * 16, j * 16)
         }
     }
 }
@@ -143,8 +142,6 @@ function draw_background(game) {
         .set_scale_absolute(canvas.width, canvas.height)
         .set_pivot(0, 0);
     game.graphics.render(draw)
-    // game.graphics.draw_image(background_image, 0, 0, canvas.width, canvas.height)
-    // ctx.drawImage(background_image, 0, 0, canvas.width, canvas.height)
 }
 
 function highlight_player(game) {
@@ -156,16 +153,8 @@ function highlight_player(game) {
 
     if (position === undefined) return
 
-    // game.graphics.draw_circle(position.x, position.y, 16, 'orangered', 4)
-
     const draw = Draw.sprite(player_sprite, position.x, position.y)
     game.graphics.render(draw)
-
-    // game.ctx.strokeStyle = 'orangered'
-    // game.ctx.lineWidth = 4
-    // game.ctx.beginPath()
-    // game.ctx.ellipse(position.x, position.y, 16, 16, 0, 0, Math.PI * 2)
-    // game.ctx.stroke()
 }
 
 run()
