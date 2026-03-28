@@ -33,6 +33,25 @@ const player_sprite = await load_image('red_orb32')
 
 const tilemap = Tilemap.randomized(16, 16, tileset)
 
+class Game {
+    server;
+
+    canvas;
+    graphics;
+
+    entities;
+    ui;
+    chat_input;
+
+    background_image;
+    tileset;
+    player_sprite;
+
+    constructor() {
+        //TODO
+    }
+}
+
 const game = {
     player_id: undefined,
     entities: entities,
