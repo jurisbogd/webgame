@@ -17,7 +17,8 @@ export function generate_map(i, j) {
     wallmap[size - 1][0] = 17;
     wallmap[size - 1][size - 1] = 17;
 
-    // top
+    const stone_period = 4 + rng() % 4;
+
     for (let i = 1; i < size - 1; i++) {
         // wall tops in top row
         wallmap[i][0] = 21;
@@ -31,13 +32,9 @@ export function generate_map(i, j) {
         wallmap[0][i] = 18;
         // wall tops in right column
         wallmap[size - 1][i] = 16;
-    }
 
-    // grass and stone
-    const stone_period = 4 + rng() % 4;
-
-    for (let i = 1; i < size - 2; ++i) {
-        for (let j = 3; j < size - 2; ++j) {
+        // grass and rock
+        for (let j = 3; j < size - 1; ++j) {
             const stones_vertical = (i - 1) % stone_period === 0
             const stones_horizontal = (j - 3) % stone_period === 0
             if (stones_vertical !== stones_horizontal) {
