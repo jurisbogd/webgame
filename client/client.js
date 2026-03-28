@@ -13,73 +13,86 @@ import { Tilemap } from './Tilemap.js';
 // set this to address and port of server before running client
 const server_address = 'localhost'
 const port = 10799
-const server = await init_server(`ws://${server_address}:${port}`)
-
 const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
-const background_image = await load_image_url(background_image_url)
-
-const canvas = document.getElementById('canvas-2d');
-const graphics = await init_graphics_crc2d(canvas)
-
-const ctx = canvas.getContext('2d');
-const entities = new Map()
-const ui = document.getElementById('ui')
-const chat_input = document.getElementById('chat-input')
-
-init_keyboard_input(canvas)
-
-const tileset = await load_tileset('tileset_basic')
-const player_sprite = await load_image('red_orb32')
-
-const tilemap = Tilemap.randomized(16, 16, tileset)
 
 class Game {
-    server;
-
     canvas;
-    graphics;
-
-    entities;
     ui;
     chat_input;
+
+    entities;
+
+    graphics;
+    server;
 
     background_image;
     tileset;
     player_sprite;
 
-    constructor() {
-        //TODO
+    tilemap;
+
+    player_id = undefined;
+
+    static async init() {
+        const game = new Game()
+        game.canvas = document.getElementById('canvas-2d');
+        game.ui = document.getElementById('ui')
+        game.chat_input = document.getElementById('chat-input')
+
+        game.graphics = await init_graphics_crc2d(game.canvas);
+        game.server = await init_server(`ws://${server_address}:${port}`);
+
+        game.entities = new Map();
+
+        game.background_image = await load_image_url(background_image_url);
+        game.tileset = await load_tileset('tileset_basic');
+        game.player_sprite = await load_image('red_orb32');
+
+        game.tilemap = Tilemap.randomized(16, 16, game.tileset);
+
+        init_keyboard_input(game.canvas)
+
+        return game;
     }
 }
 
-const game = {
-    player_id: undefined,
-    entities: entities,
-    server: server,
-    graphics: graphics,
-    ui: ui,
-    ctx: ctx,
+function step(game) {
+    if (is_key_pressed('Enter')) game.chat_input.focus()
+
+    consume_server_packets(game)
+    update_player(game)
+
+    // send all buffered network events to server
+    flush_events(game.server.ws)
+
+    // rendering
+    game.graphics.clear()
+    draw_background(game)
+    draw_tilemap(game)
+    highlight_player(game)
+    render_chat_bubbles(game)
+
+    update_keyboard_input()
 }
 
-chat_input.onkeydown = (event) => {
+const game = await Game.init();
+
+game.chat_input.onkeydown = (event) => {
     if (event.code === 'Enter') {
         const message = chat_input.value
 
         if (message != '') {
             queue_event({ tag: 'CHAT_MESSAGE', message: message })
-            chat_input.value = ''
+            game.chat_input.value = ''
         }
 
-        canvas.focus()
+        game.canvas.focus()
     }
 }
 
-function run() {
-    step()
-    requestAnimationFrame(run)
-}
-
 function draw_tilemap(game) {
+    const tilemap = game.tilemap;
+
     for (let i = 0; i < tilemap.width; i += 1) {
         for (let j = 0; j < tilemap.height; j += 1) {
             const tile = tilemap.get_tile(i, j)
@@ -96,25 +109,6 @@ function draw_tilemap(game) {
             game.graphics.render(draw)
         }
     }
-}
-
-function step() {
-    if (is_key_pressed('Enter')) chat_input.focus()
-
-    consume_server_packets(game)
-    update_player(game)
-
-    // send all buffered network events to server
-    flush_events(game.server.ws)
-
-    // rendering
-    game.graphics.clear()
-    draw_background(game)
-    draw_tilemap(game)
-    highlight_player(game)
-    render_chat_bubbles(game)
-
-    update_keyboard_input()
 }
 
 function consume_server_packets(game) {
@@ -138,8 +132,8 @@ function consume_server_packets(game) {
 }
 
 function draw_background(game) {
-    const draw = Draw.sprite(background_image, 0, 0)
-        .set_scale_absolute(canvas.width, canvas.height)
+    const draw = Draw.sprite(game.background_image, 0, 0)
+        .set_scale_absolute(game.canvas.width, game.canvas.height)
         .set_pivot(0, 0);
     game.graphics.render(draw)
 }
@@ -153,8 +147,13 @@ function highlight_player(game) {
 
     if (position === undefined) return
 
-    const draw = Draw.sprite(player_sprite, position.x, position.y)
+    const draw = Draw.sprite(game.player_sprite, position.x, position.y)
     game.graphics.render(draw)
+}
+
+const run = () => {
+    step(game)
+    requestAnimationFrame(run)
 }
 
 run()
