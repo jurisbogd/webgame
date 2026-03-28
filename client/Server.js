@@ -19,6 +19,6 @@ async function connect(url) {
     }
     return new Promise((resolve, reject) => {
         ws.onopen = () => resolve(ws)
-        ws.onerror = (err) => reject(err)
+        ws.onerror = (err) => resolve(undefined)
     })
 }
