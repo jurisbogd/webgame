@@ -52,7 +52,7 @@ class Game {
         game.player_sprite = await load_image('red_orb32');
 
         // game.tilemap = Tilemap.randomized(16, 16, game.tileset);
-        const wallmap = generate_map(0, 0);
+        const wallmap = generate_map(Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
         const width = wallmap.length;
         const height = wallmap[0].length;
         const tilemap = new Tilemap(width, height);
@@ -73,6 +73,18 @@ class Game {
     }
 }
 
+function viewport_follow_player(game) {
+    const player = get_player(game);
+
+    if (!player) return;
+
+    const position = player.position;
+
+    if (position === undefined) return;
+
+    game.graphics.set_viewport_position(position.x, position.y);
+}
+
 function step(game) {
     if (is_key_pressed('Enter')) game.chat_input.focus()
 
@@ -84,6 +96,7 @@ function step(game) {
 
     // rendering
     game.graphics.clear()
+    viewport_follow_player(game)
     draw_background(game)
     draw_tilemap(game)
     highlight_player(game)
@@ -149,7 +162,8 @@ function consume_server_packets(game) {
 }
 
 function draw_background(game) {
-    const draw = Draw.sprite(game.background_image, 0, 0)
+    const viewport = game.graphics.viewport;
+    const draw = Draw.sprite(game.background_image, viewport.get_left(), viewport.get_top())
         .set_scale_absolute(game.canvas.width, game.canvas.height)
         .set_pivot(0, 0);
     game.graphics.render(draw)

@@ -6,7 +6,9 @@ export function generate_map(i, j) {
     const seed = cantor_pair(i, j);
     const rng = mulberry32(seed);
 
-    const size = 24 + rng() % 8;
+    const size = 24 + Math.floor(rng() * 8);
+
+    console.log(size)
 
     const wallmap = init_2d_array(size, size, () => -1);
 
@@ -17,7 +19,7 @@ export function generate_map(i, j) {
     wallmap[size - 1][0] = 17;
     wallmap[size - 1][size - 1] = 17;
 
-    const stone_period = 4 + rng() % 4;
+    const stone_period = 4 + Math.floor(rng() * 4);
 
     for (let i = 1; i < size - 1; i++) {
         // wall tops in top row
@@ -35,8 +37,8 @@ export function generate_map(i, j) {
 
         // grass and rock
         for (let j = 3; j < size - 1; ++j) {
-            const stones_vertical = (i - 1) % stone_period === 0
-            const stones_horizontal = (j - 3) % stone_period === 0
+            const stones_vertical = (i - 1) % stone_period === 0;
+            const stones_horizontal = (j - 3) % stone_period === 0;
             if (stones_vertical !== stones_horizontal) {
                 wallmap[i][j] = 1;
             }

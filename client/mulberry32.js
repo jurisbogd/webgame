@@ -1,12 +1,8 @@
 export function mulberry32(seed) {
     return function () {
-        seed = (seed + 0x9e3779b9) | 0;
-        let z = seed;
-        z ^= z >>> 16;
-        z = Math.imul(z, 0x21f0aaad);
-        z ^= z >>> 15;
-        z = Math.imul(z, 0x735a2d97);
-        z ^= z >>> 15;
-        return z;
+        var t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ t >>> 15, t | 1);
+        t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
     }
 }
