@@ -1,3 +1,5 @@
+import { Rectangle } from './Rectangle.js'
+
 export class Spritesheet {
     image;
     sprites;
