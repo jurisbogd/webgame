@@ -1,4 +1,5 @@
 import { CRC2DGraphics } from './graphics_crc2d.js'
+import { Spritesheet } from './Spritesheet.js'
 import { Tileset } from './Tileset.js'
 
 export async function load_image_url(url) {
@@ -19,6 +20,17 @@ export async function load_tileset(name) {
     const image = await load_image(name)
     const tileset = new Tileset(image)
     return tileset
+}
+
+export async function load_spritesheet(name) {
+    const image = await load_image(name);
+
+    const response = await fetch(`/content/${name}.atlas`);
+    const atlas = await response.json();
+
+    const spritesheet = new Spritesheet(image, atlas);
+
+    return spritesheet;
 }
 
 // export function init_content(graphics) {
