@@ -23,14 +23,31 @@ export class Spritesheet {
                 }
 
                 const rect = new Rectangle(x, y, w, h);
-                this.sprites[sprite_name] = rect;
+
+                const pivot_x = sprite.pivot_x;
+                const pivot_y = sprite.pivot_y;
+                const pivot = pivot_x === undefined || pivot_y === undefined
+                    ? Vec2.zero()
+                    : new Vec2(pivot_x, pivot_y);
+
+                this.sprites[sprite_name] = {
+                    rect,
+                    pivot,
+                }
             }
         }
     }
 
     get_sprite_rect(sprite_name) {
-        const sprite_rect = this.sprites[sprite_name];
-        return sprite_rect;
+        const sprite = this.sprites[sprite_name];
+        const rect = sprite.rect;
+        return rect;
+    }
+
+    get_sprite_pivot(sprite_name) {
+        const sprite = this.sprites[sprite_name];
+        const pivot = sprite.pivot;
+        return pivot;
     }
 
     has_sprite(sprite_name) {
