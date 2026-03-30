@@ -88,7 +88,7 @@ function step(game) {
     // rendering
     game.graphics.clear()
     viewport_follow_player(game)
-    draw_background(game)
+    render_background(game)
     // draw_tilemap(game)
     render_room_floor(game);
     render_room_features(game);
@@ -134,12 +134,14 @@ function consume_server_packets(game) {
     game.server.received.length = 0
 }
 
-function draw_background(game) {
-    const viewport = game.graphics.viewport;
-    const draw = Draw.image(game.background_image, viewport.get_left(), viewport.get_top())
+function render_background(game) {
+    const graphics = game.graphics;
+    const viewport = graphics.viewport;
+    const background_image = game.background_image;
+    const draw = Draw.image(background_image, viewport.get_left(), viewport.get_top())
         .set_scale_absolute(game.canvas.width, game.canvas.height);
-    // .set_pivot(0, 0);
-    game.graphics.render(draw)
+
+    graphics.render(draw)
 }
 
 function highlight_player(game) {
