@@ -25,11 +25,12 @@ export class Draw {
         return draw;
     }
 
-    static sprite(sprite, x, y) {
-        const transform = new Rectangle(x, y, sprite.width, sprite.height);
-        const sprite_rect = new Rectangle(0, 0, sprite.width, sprite.height);
-        const pivot = new Vec2(0.5, 0.5);
-        const draw = new Draw(sprite, transform, sprite_rect, pivot);
+    static sprite(spritesheet, id, x, y) {
+        const sprite_rect = spritesheet.get_sprite_rect(id);
+        const transform = new Rectangle(x, y, sprite_rect.get_width(), sprite_rect.get_height());
+        const pivot = Vec2.zero();
+
+        const draw = new Draw(spritesheet.image, transform, sprite_rect, pivot);
 
         return draw;
     }
