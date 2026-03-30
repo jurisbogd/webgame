@@ -14,7 +14,7 @@ import { Vec2 } from './math/Vec2.js';
 import { render_room_features } from './render/render_room_features.js';
 import { render_room_floor } from './render/render_room_floor.js';
 import { render_background } from './render/render_background.js';
-import { render_player } from './render_player.js';
+import { render_player } from './render/render_player.js';
 
 // set this to address and port of server before running client
 const server_address = 'localhost'

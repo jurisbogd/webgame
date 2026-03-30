@@ -1,5 +1,5 @@
-import { Draw } from './Draw.js';
-import { get_player } from './player.js';
+import { Draw } from '../Draw.js';
+import { get_player } from '../player.js';
 
 export function render_player(game) {
     const player = get_player(game);
