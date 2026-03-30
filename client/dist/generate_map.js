@@ -85,7 +85,7 @@ function generate_tilemap(tileset, seed) {
             else {
                 floor[i][j] = {
                     tileset,
-                    id: 'paved',
+                    id: 'grass',
                 };
             }
         }
