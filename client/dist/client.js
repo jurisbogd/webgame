@@ -12,7 +12,7 @@ import { Tilemap } from './Tilemap.js';
 import { Tile } from './Tile.js'
 import { generate_map } from './generate_map.js';
 import { init_2d_array } from './init_2d_array.js';
-import { Rectangle } from './Rectangle.js';
+import { Rectangle } from './math/Rectangle.js';
 import { Vec2 } from './math/Vec2.js';
 
 // set this to address and port of server before running client

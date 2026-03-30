@@ -1,6 +1,6 @@
-import { cantor_pair } from "./cantor_pair.js";
+import { cantor_pair } from "./math/cantor_pair.js";
 import { init_2d_array } from "./init_2d_array.js";
-import { mulberry32 } from "./mulberry32.js";
+import { mulberry32 } from "./math/mulberry32.js";
 
 export function generate_map(i, j) {
     const seed = cantor_pair(i, j);
