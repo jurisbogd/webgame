@@ -76,10 +76,43 @@ export class Draw {
         return this;
     }
 
+    get_top() {
+        const y = this.transform.get_y();
+        const pivot_y = this.pivot.get_y();
+        const top = y - pivot_y;
+
+        return top;
+    }
+
+    get_bottom() {
+        const y = this.transform.get_y();
+        const height = this.transform.get_height();
+        const pivot_y = this.pivot.get_y();
+        const bottom = y + height - pivot_y;
+
+        return bottom;
+    }
+
+    get_left() {
+        const x = this.transform.get_x();
+        const pivot_x = this.pivot.get_x();
+        const left = x - pivot_x;
+
+        return left;
+    }
+
+    get_right() {
+        const x = this.transform.get_x();
+        const width = this.transform.get_width();
+        const pivot_x = this.pivot.get_x();
+        const right = x + width - pivot_x;
+
+        return right;
+    }
+
     // set depth to bottom of rendered sprite
     set_depth_bottom(depth_mod = 0) {
-        // const pivot_mod = this.pivot.get_y();
-        const bottom = this.transform.get_bottom();
+        const bottom = this.get_bottom();
         const depth = bottom + depth_mod;
         this.depth = depth;
 
