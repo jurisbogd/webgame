@@ -72,6 +72,13 @@ export class Draw {
         return this;
     }
 
+    set_pivot_absolute(x, y) {
+        this.pivot.set_x(x);
+        this.pivot.set_y(y);
+
+        return this;
+    }
+
     set_depth(depth) {
         this.depth = depth;
 
