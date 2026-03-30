@@ -1,4 +1,4 @@
-import { Rectangle } from "./Rectangle.js"
+import { Rectangle } from "./math/Rectangle.js"
 
 export const TILE_SIZE = 16
 

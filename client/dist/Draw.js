@@ -1,5 +1,5 @@
-import { Rectangle } from "./Rectangle.js";
-import { Vec2 } from "./Vec2.js";
+import { Rectangle } from "./math/Rectangle.js";
+import { Vec2 } from "./math/Vec2.js";
 
 export class Draw {
     sprite;
