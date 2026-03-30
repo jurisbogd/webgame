@@ -12,8 +12,9 @@ export class CRC2DGraphics {
     ctx
     draw_buffer
     viewport;
+    render_scale;
 
-    constructor(canvas) {
+    constructor(canvas, render_scale = 2) {
         this.canvas = canvas
         this.ctx = this.canvas.getContext('2d');
 
@@ -22,7 +23,12 @@ export class CRC2DGraphics {
         }
 
         this.ctx.imageSmoothingEnabled = false
-        this.viewport = new Rectangle(0, 0, canvas.width, canvas.height);
+
+        this.render_scale = render_scale;
+
+        const viewport_width = canvas.width / render_scale;
+        const viewport_height = canvas.height / render_scale;
+        this.viewport = new Rectangle(0, 0, viewport_width, viewport_height);
     }
 
     clear(color = 'cornflowerblue') {
@@ -58,16 +64,23 @@ export class CRC2DGraphics {
     }
 
     render(draw) {
+        const position_x = draw.transform.get_x() - draw.pivot.get_x() - this.viewport.get_left();
+        const position_y = draw.transform.get_y() - draw.pivot.get_y() - this.viewport.get_top();
+        const position_x_scaled = Math.floor(position_x) * this.render_scale;
+        const position_y_scaled = Math.floor(position_y) * this.render_scale;
+        const width_scaled = draw.transform.get_width() * this.render_scale;
+        const height_scaled = draw.transform.get_height() * this.render_scale;
+
         this.ctx.drawImage(
             draw.sprite,
             draw.sprite_rect.get_x(),
             draw.sprite_rect.get_y(),
             draw.sprite_rect.get_width(),
             draw.sprite_rect.get_height(),
-            Math.floor(draw.transform.get_x() - draw.pivot.get_x() - this.viewport.get_left()),
-            Math.floor(draw.transform.get_y() - draw.pivot.get_y() - this.viewport.get_top()),
-            draw.transform.get_width(),
-            draw.transform.get_height()
+            position_x_scaled,
+            position_y_scaled,
+            width_scaled,
+            height_scaled
         )
     }
 
