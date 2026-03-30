@@ -15,6 +15,16 @@ export class Draw {
         this.pivot = pivot;
     }
 
+    static image(image, x, y) {
+        const transform = new Rectangle(x, y, image.width, image.height);
+        const sprite_rect = new Rectangle(0, 0, image.width, image.height);
+        const pivot = Vec2.zero();
+
+        const draw = new Draw(image, transform, sprite_rect, pivot);
+
+        return draw;
+    }
+
     static sprite(sprite, x, y) {
         const transform = new Rectangle(x, y, sprite.width, sprite.height);
         const sprite_rect = new Rectangle(0, 0, sprite.width, sprite.height);
