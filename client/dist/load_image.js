@@ -18,7 +18,7 @@ export async function load_image(name) {
 export async function load_spritesheet(name) {
     const image = await load_image(name);
 
-    const response = await fetch(`/content/${name}.atlas`);
+    const response = await fetch(`/content/${name}.spriteatlas`);
     const atlas = await response.json();
 
     const spritesheet = new Spritesheet(image, atlas);
