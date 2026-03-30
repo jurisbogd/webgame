@@ -172,9 +172,9 @@ function consume_server_packets(game) {
 
 function draw_background(game) {
     const viewport = game.graphics.viewport;
-    const draw = Draw.sprite(game.background_image, viewport.get_left(), viewport.get_top())
-        .set_scale_absolute(game.canvas.width, game.canvas.height)
-        .set_pivot(0, 0);
+    const draw = Draw.image(game.background_image, viewport.get_left(), viewport.get_top())
+        .set_scale_absolute(game.canvas.width, game.canvas.height);
+    // .set_pivot(0, 0);
     game.graphics.render(draw)
 }
 
@@ -187,7 +187,8 @@ function highlight_player(game) {
 
     if (position === undefined) return
 
-    const draw = Draw.sprite(game.player_sprite, position.x, position.y)
+    const draw = Draw.image(game.player_sprite, position.x, position.y)
+        .set_pivot(0.5, 0.5);
     game.graphics.render(draw)
 }
 
