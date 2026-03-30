@@ -138,12 +138,14 @@ function draw_tilemap(game) {
             }
 
             // const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
-            const image = tile.tileset.image;
-            const sprite_rect = tile.tileset.get_sprite_rect(tile.id);
-            const transform = new Rectangle(i * 32, j * 32, sprite_rect.width * 2, sprite_rect.height * 2);
-            const pivot = Vec2.zero();
+            // const image = tile.tileset.image;
+            // const sprite_rect = tile.tileset.get_sprite_rect(tile.id);
+            // const transform = new Rectangle(i * 32, j * 32, sprite_rect.width * 2, sprite_rect.height * 2);
+            // const pivot = Vec2.zero();
 
-            const draw = new Draw(image, transform, sprite_rect, pivot);
+            // const draw = new Draw(image, transform, sprite_rect, pivot);
+
+            const draw = Draw.sprite(tile.tileset, tile.id, i * 16, j * 16);
 
             game.graphics.render(draw)
         }
