@@ -5,7 +5,7 @@ import { render_chat_bubbles } from './render_chat_bubbles.js';
 import { init_keyboard_input, update_keyboard_input, is_key_pressed } from './keyboard_input.js'
 import { get_player, update_player } from './player.js';
 import { render_entities } from './render_entities.js';
-import { load_image, load_image_url, load_spritesheet, load_tileset } from './load_image.js'
+import { load_image, load_image_url, load_spritesheet } from './load_image.js'
 import { init_graphics_crc2d } from './graphics_crc2d.js';
 import { Draw } from "./Draw.js";
 import { Tilemap } from './Tilemap.js';

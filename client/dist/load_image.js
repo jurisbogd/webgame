@@ -1,6 +1,5 @@
 import { CRC2DGraphics } from './graphics_crc2d.js'
 import { Spritesheet } from './Spritesheet.js'
-import { Tileset } from './Tileset.js'
 
 export async function load_image_url(url) {
     const image = new Image()
