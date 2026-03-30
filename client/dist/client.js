@@ -10,7 +10,7 @@ import { init_graphics_crc2d } from './graphics_crc2d.js';
 import { Draw } from "./Draw.js";
 import { Tilemap } from './Tilemap.js';
 import { Tile } from './Tile.js'
-import { generate_map } from './generate_map.js';
+import { generate_room } from './generate_map.js';
 import { init_2d_array } from './init_2d_array.js';
 import { Rectangle } from './math/Rectangle.js';
 import { Vec2 } from './math/Vec2.js';
@@ -35,6 +35,7 @@ class Game {
     player_sprite;
 
     tilemap;
+    room;
 
     player_id = undefined;
 
@@ -54,7 +55,7 @@ class Game {
         game.player_sprite = await load_image('red_orb32');
 
         // game.tilemap = Tilemap.randomized(16, 16, game.tileset);
-        const wallmap = generate_map(Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
+        const [wallmap, room] = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
         const width = wallmap.length;
         const height = wallmap[0].length;
         const tilemap = new Tilemap(width, height);
@@ -67,6 +68,7 @@ class Game {
             }
         }
 
+        game.room = room;
         game.tilemap = tilemap;
 
         init_keyboard_input(game.canvas)
@@ -103,6 +105,7 @@ function step(game) {
     draw_tilemap(game)
     highlight_player(game)
     render_chat_bubbles(game)
+    game.graphics.flush_render_buffer();
 
     update_keyboard_input()
 }
@@ -123,31 +126,65 @@ game.chat_input.onkeydown = (event) => {
 }
 
 function draw_tilemap(game) {
-    const tilemap = game.tilemap;
+    // const tilemap = game.tilemap;
 
-    for (let i = 0; i < tilemap.width; i += 1) {
-        for (let j = 0; j < tilemap.height; j += 1) {
-            const tile = tilemap.get_tile(i, j)
+    // for (let i = 0; i < tilemap.width; i += 1) {
+    //     for (let j = 0; j < tilemap.height; j += 1) {
+    //         const tile = tilemap.get_tile(i, j)
 
-            if (tile.tileset === undefined) {
-                continue
+    //         if (tile.tileset === undefined) {
+    //             continue
+    //         }
+
+    //         if (tile.id === undefined) {
+    //             continue
+    //         }
+
+    //         // const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
+    //         // const image = tile.tileset.image;
+    //         // const sprite_rect = tile.tileset.get_sprite_rect(tile.id);
+    //         // const transform = new Rectangle(i * 32, j * 32, sprite_rect.width * 2, sprite_rect.height * 2);
+    //         // const pivot = Vec2.zero();
+
+    //         // const draw = new Draw(image, transform, sprite_rect, pivot);
+
+    //         const draw = Draw.sprite(tile.tileset, tile.id, i * 16, j * 16);
+
+    //         game.graphics.render(draw)
+    //     }
+    // }
+
+    const room = game.room;
+    // render floor
+    for (let i = 0; i < room.width; ++i) {
+        for (let j = 0; j < room.height; ++j) {
+            const tile = room.floor[i][j];
+
+            if (tile === undefined) {
+                continue;
             }
 
-            if (tile.id === undefined) {
-                continue
+            const x = i * 16;
+            const y = j * 16;
+            const draw = Draw.sprite(tile.tileset, tile.id, x, y);
+            game.graphics.render(draw);
+        }
+    }
+
+    // buffer features
+    for (let i = 0; i < room.width; ++i) {
+        for (let j = 0; j < room.height; ++j) {
+            const tile = room.features[i][j];
+
+            if (tile === undefined) {
+                continue;
             }
 
-            // const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
-            // const image = tile.tileset.image;
-            // const sprite_rect = tile.tileset.get_sprite_rect(tile.id);
-            // const transform = new Rectangle(i * 32, j * 32, sprite_rect.width * 2, sprite_rect.height * 2);
-            // const pivot = Vec2.zero();
-
-            // const draw = new Draw(image, transform, sprite_rect, pivot);
-
-            const draw = Draw.sprite(tile.tileset, tile.id, i * 16, j * 16);
-
-            game.graphics.render(draw)
+            const x = i * 16;
+            const y = j * 16;
+            const draw = Draw.sprite(tile.tileset, tile.id, x, y)
+                .set_depth_bottom(tile.depth_mod);
+            game.graphics.render_buffered(draw);
         }
     }
 }
@@ -190,8 +227,9 @@ function highlight_player(game) {
     if (position === undefined) return
 
     const draw = Draw.image(game.player_sprite, position.x, position.y)
-        .set_pivot(0.5, 0.5);
-    game.graphics.render(draw)
+        // .set_pivot(0.5, 0.5)
+        .set_depth_bottom();
+    game.graphics.render_buffered(draw)
 }
 
 const run = () => {

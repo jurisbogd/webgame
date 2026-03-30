@@ -26,7 +26,7 @@ export class Draw {
     }
 
     static sprite(spritesheet, id, x, y) {
-        const sprite_rect = spritesheet.get_sprite_rect(id);
+        const sprite_rect = Rectangle.copy(spritesheet.get_sprite_rect(id));
         const transform = new Rectangle(x, y, sprite_rect.get_width(), sprite_rect.get_height());
         const pivot = Vec2.zero();
 
@@ -57,8 +57,8 @@ export class Draw {
     }
 
     set_pivot(x, y) {
-        this.pivot.set_x(x * this.sprite_rect.get_width());
-        this.pivot.set_y(y * this.sprite_rect.get_height());
+        this.pivot.set_x(x * this.transform.get_width());
+        this.pivot.set_y(y * this.transform.get_height());
 
         return this;
     }
@@ -77,8 +77,11 @@ export class Draw {
     }
 
     // set depth to bottom of rendered sprite
-    set_depth_bottom() {
-        this.depth = transform.get_bottom();
+    set_depth_bottom(depth_mod = 0) {
+        // const pivot_mod = this.pivot.get_y();
+        const bottom = this.transform.get_bottom();
+        const depth = bottom + depth_mod;
+        this.depth = depth;
 
         return this;
     }

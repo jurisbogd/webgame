@@ -69,7 +69,7 @@ export class CRC2DGraphics {
      */
     render(draw) {
         // skip rendering if outside of viewport
-        if (!this.viewport.contains(draw.transform)) {
+        if (!this.#in_viewport(draw)) {
             return;
         }
 
@@ -84,7 +84,7 @@ export class CRC2DGraphics {
      */
     render_buffered(draw) {
         // skip rendering if outside of viewport
-        if (!this.viewport.contains(draw.transform)) {
+        if (!this.#in_viewport(draw)) {
             return;
         }
 
@@ -108,8 +108,8 @@ export class CRC2DGraphics {
     }
 
     #render(draw) {
-        const position_x = draw.transform.get_x() - draw.pivot.get_x() - this.viewport.get_left();
-        const position_y = draw.transform.get_y() - draw.pivot.get_y() - this.viewport.get_top();
+        const position_x = draw.transform.get_left() - draw.pivot.get_x() - this.viewport.get_left();
+        const position_y = draw.transform.get_top() - draw.pivot.get_y() - this.viewport.get_top();
         const position_x_scaled = Math.floor(position_x) * this.render_scale;
         const position_y_scaled = Math.floor(position_y) * this.render_scale;
         const width_scaled = draw.transform.get_width() * this.render_scale;
@@ -126,6 +126,10 @@ export class CRC2DGraphics {
             width_scaled,
             height_scaled
         )
+    }
+
+    #in_viewport(draw) {
+        return this.viewport.contains(draw.transform);
     }
 
     set_viewport_position(x, y) {
