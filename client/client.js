@@ -5,13 +5,15 @@ import { render_chat_bubbles } from './render_chat_bubbles.js';
 import { init_keyboard_input, update_keyboard_input, is_key_pressed } from './keyboard_input.js'
 import { get_player, update_player } from './player.js';
 import { render_entities } from './render_entities.js';
-import { load_image, load_image_url, load_tileset } from './load_image.js'
+import { load_image, load_image_url, load_spritesheet, load_tileset } from './load_image.js'
 import { init_graphics_crc2d } from './graphics_crc2d.js';
 import { Draw } from "./Draw.js";
 import { Tilemap } from './Tilemap.js';
 import { Tile } from './Tile.js'
 import { generate_map } from './generate_map.js';
 import { init_2d_array } from './init_2d_array.js';
+import { Rectangle } from './Rectangle.js';
+import { Vec2 } from './Vec2.js';
 
 // set this to address and port of server before running client
 const server_address = 'localhost'
@@ -48,7 +50,7 @@ class Game {
         game.entities = new Map();
 
         game.background_image = await load_image_url(background_image_url);
-        game.tileset = await load_tileset('tileset_basic');
+        game.tileset = await load_spritesheet('tileset_basic');
         game.player_sprite = await load_image('red_orb32');
 
         // game.tilemap = Tilemap.randomized(16, 16, game.tileset);
@@ -131,11 +133,18 @@ function draw_tilemap(game) {
                 continue
             }
 
-            if (!tile.tileset.has_tile(tile.id)) {
+            if (tile.id === undefined) {
                 continue
             }
 
-            const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
+            // const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
+            const image = tile.tileset.image;
+            const sprite_rect = tile.tileset.get_sprite_rect(tile.id);
+            const transform = new Rectangle(i * 32, j * 32, sprite_rect.width * 2, sprite_rect.height * 2);
+            const pivot = Vec2.zero();
+
+            const draw = new Draw(image, transform, sprite_rect, pivot);
+
             game.graphics.render(draw)
         }
     }
