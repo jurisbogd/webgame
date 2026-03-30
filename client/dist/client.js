@@ -102,7 +102,9 @@ function step(game) {
     game.graphics.clear()
     viewport_follow_player(game)
     draw_background(game)
-    draw_tilemap(game)
+    // draw_tilemap(game)
+    render_room_floor(game);
+    render_room_features(game);
     highlight_player(game)
     render_chat_bubbles(game)
     game.graphics.flush_render_buffer();
@@ -122,6 +124,50 @@ game.chat_input.onkeydown = (event) => {
         }
 
         game.canvas.focus()
+    }
+}
+
+function render_room_features(game) {
+    const room = game.room;
+    const features = room.features;
+    const graphics = game.graphics;
+
+    for (let j = 0; j < room.height; ++j) {
+        for (let i = 0; i < room.width; ++i) {
+            const tile = features[i][j];
+
+            // ignore missing tiles
+            if (tile === undefined) continue;
+
+            const x = i * 16;
+            const y = j * 16;
+            const draw = Draw.sprite(tile.tileset, tile.id, x, y)
+                .set_depth_bottom(tile.depth_mod);
+
+            // buffer draw call for depth sorting
+            graphics.render_buffered(draw);
+        }
+    }
+}
+
+function render_room_floor(game) {
+    const room = game.room;
+    const floor = room.floor;
+    const graphics = game.graphics;
+
+    for (let j = 0; j < room.height; ++j) {
+        for (let i = 0; i < room.width; ++i) {
+            const tile = floor[i][j];
+
+            // ignore missing tiles
+            if (tile === undefined) continue;
+
+            const x = i * 16;
+            const y = j * 16;
+            const draw = Draw.sprite(tile.tileset, tile.id, x, y);
+
+            graphics.render(draw);
+        }
     }
 }
 
