@@ -103,28 +103,28 @@
                 "walk_down_0",
                 "walk_down_1"
             ],
-            "duration": 1.5
+            "duration": 1.0
         },
         "walk_left": {
             "frames": [
                 "walk_left_0",
                 "walk_left_1"
             ],
-            "duration": 1.5
+            "duration": 1.0
         },
         "walk_up": {
             "frames": [
                 "walk_up_0",
                 "walk_up_1"
             ],
-            "duration": 1.5
+            "duration": 1.0
         },
         "walk_right": {
             "frames": [
                 "walk_right_0",
                 "walk_right_1"
             ],
-            "duration": 1.5
+            "duration": 1.0
         }
     }
 }
