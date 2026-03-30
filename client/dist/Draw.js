@@ -28,7 +28,8 @@ export class Draw {
     static sprite(spritesheet, id, x, y) {
         const sprite_rect = Rectangle.copy(spritesheet.get_sprite_rect(id));
         const transform = new Rectangle(x, y, sprite_rect.get_width(), sprite_rect.get_height());
-        const pivot = Vec2.zero();
+        const sprite_pivot = spritesheet.get_sprite_pivot(id);
+        const pivot = new Vec2(sprite_pivot.x, sprite_pivot.y);
 
         const draw = new Draw(spritesheet.image, transform, sprite_rect, pivot);
 

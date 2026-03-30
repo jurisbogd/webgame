@@ -29,6 +29,9 @@ function new_entity_handler(game, event) {
 
     const position = { x: event.x, y: event.y }
     entity.position = position
+    entity.previous_position = position;
+    entity.look_direction = 'right';
+    entity.animation_time = 0;
 
     game.entities.set(event.id, entity)
 }

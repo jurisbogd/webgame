@@ -1,5 +1,6 @@
 import { queue_event } from './event_queue.js'
 import { is_key_down } from './keyboard_input.js'
+import { Vec2 } from './math/Vec2.js'
 
 export function update_player(game) {
     const player = get_player(game)
@@ -18,6 +19,9 @@ export function update_player(game) {
     if (is_key_down('KeyA')) velocityX -= speed
     if (is_key_down('KeyS')) velocityY += speed
     if (is_key_down('KeyD')) velocityX += speed
+
+    const previous_position = new Vec2(position.x, position.y);
+    player.previous_position = previous_position;
 
     if (velocityX !== 0 || velocityY !== 0) {
         position.x += velocityX

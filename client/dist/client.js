@@ -53,6 +53,7 @@ class Game {
         game.background_image = await load_image_url(background_image_url);
         game.tileset = await load_spritesheet('tileset_basic');
         game.player_sprite = await load_image('red_orb32');
+        game.player_basic_demo = await load_spritesheet('player_basic_demo');
 
         const room = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
         game.room = room;
@@ -139,11 +140,44 @@ function render_player(game) {
     if (!player) return
 
     const position = player.position
+    const previous_position = player.previous_position;
 
-    if (position === undefined) return
+    if (position === undefined || previous_position === undefined) return
 
-    const draw = Draw.image(game.player_sprite, position.x, position.y)
-        .set_pivot(0.5, 0.5)
+    const previous_look_direction = player.look_direction;
+
+    if (position.y > previous_position.y) player.look_direction = 'down';
+    else if (position.y < previous_position.y) player.look_direction = 'up';
+    else if (position.x > previous_position.x) player.look_direction = 'right';
+    else if (position.x < previous_position.x) player.look_direction = 'left';
+
+    const spritesheet = game.player_basic_demo;
+
+    let frame;
+    if (position.x !== previous_position.x || position.y !== previous_position.y) {
+        let animation;
+
+        if (previous_look_direction !== player.look_direction) {
+            player.animation_time = 0;
+        }
+
+        if (player.look_direction === 'right') animation = 'walk_right';
+        else if (player.look_direction === 'left') animation = 'walk_left';
+        else if (player.look_direction === 'down') animation = 'walk_down';
+        else if (player.look_direction === 'up') animation = 'walk_up';
+
+        frame = spritesheet.get_animation_frame(animation, player.animation_time);
+        player.animation_time = spritesheet.step_animation_time(animation, player.animation_time);
+    }
+    else {
+        if (player.look_direction === 'right') frame = 'look_right';
+        else if (player.look_direction === 'left') frame = 'look_left';
+        else if (player.look_direction === 'down') frame = 'look_down';
+        else if (player.look_direction === 'up') frame = 'look_up';
+    }
+
+    const draw = Draw.sprite(game.player_basic_demo, frame, position.x, position.y)
+        // .set_pivot(0.5, 0.5)
         .set_depth_bottom();
 
     game.graphics.render_buffered(draw)
