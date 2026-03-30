@@ -19,6 +19,7 @@ export class Spritesheet {
                 const h = sprite.h;
 
                 if (x === undefined || y === undefined || w === undefined || h === undefined) {
+                    console.warn(`Sprite '${sprite_name}' has some undefined properties.`);
                     continue;
                 }
 
