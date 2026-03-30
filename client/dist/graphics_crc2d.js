@@ -63,8 +63,12 @@ export class CRC2DGraphics {
         this.ctx.fill()
     }
 
+    /**
+     * Immediately render a sprite to the canvas.
+     * @param {Draw} draw - draw call to render.
+     */
     render(draw) {
-        // skip drawing if not visible
+        // skip drawing if outside of viewport
         if (!this.viewport.contains(draw.transform)) {
             return;
         }
