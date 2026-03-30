@@ -1,4 +1,5 @@
 import { Rectangle } from './math/Rectangle.js'
+import { Vec2 } from './math/Vec2.js';
 
 export class Spritesheet {
     image;
