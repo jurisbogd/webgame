@@ -64,6 +64,11 @@ export class CRC2DGraphics {
     }
 
     render(draw) {
+        // skip drawing if not visible
+        if (!this.viewport.contains(draw.transform)) {
+            return;
+        }
+
         const position_x = draw.transform.get_x() - draw.pivot.get_x() - this.viewport.get_left();
         const position_y = draw.transform.get_y() - draw.pivot.get_y() - this.viewport.get_top();
         const position_x_scaled = Math.floor(position_x) * this.render_scale;
