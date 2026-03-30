@@ -16,6 +16,7 @@ import { Rectangle } from './math/Rectangle.js';
 import { Vec2 } from './math/Vec2.js';
 import { render_room_features } from './render/render_room_features.js';
 import { render_room_floor } from './render/render_room_floor.js';
+import { render_background } from './render/render_background.js';
 
 // set this to address and port of server before running client
 const server_address = 'localhost'
@@ -132,16 +133,6 @@ function consume_server_packets(game) {
     }
 
     game.server.received.length = 0
-}
-
-function render_background(game) {
-    const graphics = game.graphics;
-    const viewport = graphics.viewport;
-    const background_image = game.background_image;
-    const draw = Draw.image(background_image, viewport.get_left(), viewport.get_top())
-        .set_scale_absolute(game.canvas.width, game.canvas.height);
-
-    graphics.render(draw)
 }
 
 function highlight_player(game) {
