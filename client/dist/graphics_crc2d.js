@@ -64,15 +64,50 @@ export class CRC2DGraphics {
     }
 
     /**
-     * Immediately render a sprite to the canvas.
-     * @param {Draw} draw - draw call to render.
+     * Immediately render a draw to the canvas.
+     * @param {Draw} draw - draw to be rendered.
      */
     render(draw) {
-        // skip drawing if outside of viewport
+        // skip rendering if outside of viewport
         if (!this.viewport.contains(draw.transform)) {
             return;
         }
 
+        this.#render(draw);
+    }
+
+    render_buffer = [];
+
+    /**
+     * Buffer a draw to be later rendered ordered by depth.
+     * @param {Draw} draw - draw to be rendered.
+     */
+    render_buffered(draw) {
+        // skip rendering if outside of viewport
+        if (!this.viewport.contains(draw.transform)) {
+            return;
+        }
+
+        this.render_buffer.push(draw);
+    }
+
+    /**
+     * Sort and draw all buffered draws.
+     */
+    flush_render_buffer() {
+        // sort by depth
+        this.render_buffer.sort((a, b) => a.depth - b.depth);
+
+        // draw all
+        for (const draw of this.render_buffer) {
+            this.#render(draw);
+        }
+
+        // clear render buffer
+        this.render_buffer.length = 0;
+    }
+
+    #render(draw) {
         const position_x = draw.transform.get_x() - draw.pivot.get_x() - this.viewport.get_left();
         const position_y = draw.transform.get_y() - draw.pivot.get_y() - this.viewport.get_top();
         const position_x_scaled = Math.floor(position_x) * this.render_scale;
