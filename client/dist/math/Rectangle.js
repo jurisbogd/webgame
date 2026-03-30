@@ -3,12 +3,25 @@ export class Rectangle {
     y
     width
     height
+    pivot_x;
+    pivot_y;
 
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, pivot_x = 0.5, pivot_y = 0.5) {
         this.x = x
         this.y = y
         this.width = width
         this.height = height
+        this.pivot_x = pivot_x * width;
+        this.pivot_y = pivot_y * height;
+    }
+
+    /**
+     * Copies a rectangle object
+     * @param {Rectangle} rectangle 
+     * @returns {Rectangle}
+     */
+    static copy(rect) {
+        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
     }
 
     contains(rectangle) {
@@ -37,19 +50,19 @@ export class Rectangle {
     }
 
     get_right() {
-        return this.x + this.width / 2
+        return this.x - this.pivot_x + this.width;
     }
 
     get_left() {
-        return this.x - this.width / 2
+        return this.x - this.pivot_x;
     }
 
     get_bottom() {
-        return this.y + this.height / 2
+        return this.y - this.pivot_y + this.height;
     }
 
     get_top() {
-        return this.y - this.height / 2
+        return this.y - this.pivot_y;
     }
 
     set_x(x) {
@@ -76,5 +89,10 @@ export class Rectangle {
     set_size(width, height) {
         this.width = width
         this.height = height
+    }
+
+    set_pivot(x, y) {
+        this.pivot_x = x;
+        this.pivot_y = y;
     }
 }
