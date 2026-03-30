@@ -54,7 +54,7 @@ class Game {
         game.tileset = await load_spritesheet('tileset_basic');
         game.player_sprite = await load_image('red_orb32');
 
-        const [wallmap, room] = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
+        const room = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
         game.room = room;
 
         init_keyboard_input(game.canvas)
