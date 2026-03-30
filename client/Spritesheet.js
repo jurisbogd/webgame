@@ -11,7 +11,7 @@ export class Spritesheet {
         const sprites = atlas.sprites;
 
         if (sprites !== undefined) {
-            for (const sprite_name of sprites) {
+            for (const sprite_name in sprites) {
                 const sprite = sprites[sprite_name];
                 const x = sprite.x;
                 const y = sprite.y;
@@ -29,11 +29,11 @@ export class Spritesheet {
     }
 
     get_sprite_rect(sprite_name) {
-        const sprite_rect = sprites[sprite_name];
+        const sprite_rect = this.sprites[sprite_name];
         return sprite_rect;
     }
 
     has_sprite(sprite_name) {
-        return sprites[sprite_name] === undefined;
+        return this.sprites[sprite_name] === undefined;
     }
 }
