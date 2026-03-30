@@ -34,7 +34,6 @@ class Game {
     tileset;
     player_sprite;
 
-    tilemap;
     room;
 
     player_id = undefined;
@@ -54,22 +53,8 @@ class Game {
         game.tileset = await load_spritesheet('tileset_basic');
         game.player_sprite = await load_image('red_orb32');
 
-        // game.tilemap = Tilemap.randomized(16, 16, game.tileset);
         const [wallmap, room] = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
-        const width = wallmap.length;
-        const height = wallmap[0].length;
-        const tilemap = new Tilemap(width, height);
-
-        for (let i = 0; i < width; ++i) {
-            for (let j = 0; j < height; ++j) {
-                const tile = tilemap.get_tile(i, j);
-                tile.id = wallmap[i][j];
-                tile.tileset = game.tileset;
-            }
-        }
-
         game.room = room;
-        game.tilemap = tilemap;
 
         init_keyboard_input(game.canvas)
 
@@ -167,70 +152,6 @@ function render_room_floor(game) {
             const draw = Draw.sprite(tile.tileset, tile.id, x, y);
 
             graphics.render(draw);
-        }
-    }
-}
-
-function draw_tilemap(game) {
-    // const tilemap = game.tilemap;
-
-    // for (let i = 0; i < tilemap.width; i += 1) {
-    //     for (let j = 0; j < tilemap.height; j += 1) {
-    //         const tile = tilemap.get_tile(i, j)
-
-    //         if (tile.tileset === undefined) {
-    //             continue
-    //         }
-
-    //         if (tile.id === undefined) {
-    //             continue
-    //         }
-
-    //         // const draw = Draw.tile(tile.tileset, tile.id, i * 32, j * 32)
-    //         // const image = tile.tileset.image;
-    //         // const sprite_rect = tile.tileset.get_sprite_rect(tile.id);
-    //         // const transform = new Rectangle(i * 32, j * 32, sprite_rect.width * 2, sprite_rect.height * 2);
-    //         // const pivot = Vec2.zero();
-
-    //         // const draw = new Draw(image, transform, sprite_rect, pivot);
-
-    //         const draw = Draw.sprite(tile.tileset, tile.id, i * 16, j * 16);
-
-    //         game.graphics.render(draw)
-    //     }
-    // }
-
-    const room = game.room;
-    // render floor
-    for (let i = 0; i < room.width; ++i) {
-        for (let j = 0; j < room.height; ++j) {
-            const tile = room.floor[i][j];
-
-            if (tile === undefined) {
-                continue;
-            }
-
-            const x = i * 16;
-            const y = j * 16;
-            const draw = Draw.sprite(tile.tileset, tile.id, x, y);
-            game.graphics.render(draw);
-        }
-    }
-
-    // buffer features
-    for (let i = 0; i < room.width; ++i) {
-        for (let j = 0; j < room.height; ++j) {
-            const tile = room.features[i][j];
-
-            if (tile === undefined) {
-                continue;
-            }
-
-            const x = i * 16;
-            const y = j * 16;
-            const draw = Draw.sprite(tile.tileset, tile.id, x, y)
-                .set_depth_bottom(tile.depth_mod);
-            game.graphics.render_buffered(draw);
         }
     }
 }
