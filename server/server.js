@@ -2,71 +2,90 @@ import { WebSocketServer } from 'ws'
 import { push_event, flush_events } from './network_event_buffer.js'
 import { select_random } from './select_random.js'
 import { network_event_handlers } from './network_event_handlers.js'
+import { create_game } from './create/create_game.js'
 
-const port = 10799
-const server = new WebSocketServer({ port: port })
-const players = new Map()
-const newPlayers = []
-const packetsFromClients = []
-const map = {
-    width: 640,
-    height: 480,
-}
-const bouncers = new Map()
+// const port = 10799
+// const server = new WebSocketServer({ port: port })
+// const players = new Map()
+// const newPlayers = []
+// const packetsFromClients = []
+// const map = {
+//     width: 640,
+//     height: 480,
+// }
 
-let nextEntityId = 0
+// let nextEntityId = 0
 
-const game = {
-    map: map,
-    entities: players,
-    packet_to_send: undefined,
-    players_to_delete: [],
-    rooms: new Map(),
-}
+// const game = {
+//     map: map,
+//     entities: players,
+//     packet_to_send: undefined,
+//     players_to_delete: [],
+//     rooms: new Map(),
+// }
 
-server.on('connection', (connection) => {
-    console.log('new connection')
+const game = create_game();
 
-    const id = nextEntityId
-    nextEntityId += 1
+// server.on('connection', (connection) => {
+//     console.log('new connection')
 
-    const player = {
-        connection: connection,
-        x: Math.random() * map.width,
-        y: Math.random() * map.height,
-    }
+//     const id = nextEntityId
+//     nextEntityId += 1
 
-    sendInitializationPacket(connection, id)
+//     const player = {
+//         connection: connection,
+//         x: Math.random() * map.width,
+//         y: Math.random() * map.height,
+//     }
 
-    players.set(id, player)
-    newPlayers.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
+//     sendInitializationPacket(connection, id)
 
-    // packetToBeSent.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
+//     players.set(id, player)
+//     newPlayers.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
 
-    connection.onmessage = message => {
-        const packet = JSON.parse(message.data)
-        packet.sender = id
-        packetsFromClients.push(packet)
-    }
-    connection.onerror = error => console.error(error)
-    connection.onclose = () => game.players_to_delete.push(id)
-})
+//     // packetToBeSent.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
+
+//     connection.onmessage = message => {
+//         const packet = JSON.parse(message.data)
+//         packet.sender = id
+//         packetsFromClients.push(packet)
+//     }
+//     connection.onerror = error => console.error(error)
+//     connection.onclose = () => game.players_to_delete.push(id)
+// })
 
 function run() {
-    const timeStep = 1000 / 60 //60 FPS
-    setInterval(() => { step(game) }, timeStep)
+    const time_step = 1000 / 60; //60 FPS
+    setInterval(() => { step(game) }, time_step);
 }
 
-function sendInitializationPacket(connection, id) {
-    console.log('sending initialization packet')
-    const packet = { events: [] }
-    packet.events.push({ tag: 'SET_PLAYER_ID', id: id })
-    for (const [id, player] of players) {
-        packet.events.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
+// function sendInitializationPacket(connection, id) {
+//     console.log('sending initialization packet')
+//     const packet = { events: [] }
+//     packet.events.push({ tag: 'SET_PLAYER_ID', id: id })
+//     for (const [id, player] of players) {
+//         packet.events.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
+//     }
+//     const json = JSON.stringify(packet)
+//     connection.send(JSON.stringify(packet))
+//     console.log(json)
+// }
+
+function consume_new_players(game) {
+    for (const player_id of game.new_players) {
+        const player = game.players.get(player_id);
+
+        const event = {
+            tag: 'NEW_ENTITY',
+            id: player_id,
+            x: player.x,
+            y: player.y,
+        };
+
+        game.packet_to_send.events.push(event);
     }
-    const json = JSON.stringify(packet)
-    connection.send(JSON.stringify(packet))
-    console.log(json)
+
+    game.new_players.length = 0;
 }
 
 function step(game) {
@@ -75,17 +94,13 @@ function step(game) {
     consumeClientPackets(game)
     flushplayersToBeDeleted(game)
 
-    for (const event of newPlayers) {
-        game.packet_to_send.events.push(event)
-    }
-
-    newPlayers.length = 0
+    consume_new_players(game);
 
     transmitToAllClients(game)
 }
 
 function consumeClientPackets(game) {
-    for (const packet of packetsFromClients) {
+    for (const packet of game.packets_from_clients) {
         for (const event of packet.events) {
             const handler = network_event_handlers[event.tag]
 
@@ -98,12 +113,12 @@ function consumeClientPackets(game) {
         }
     }
 
-    packetsFromClients.length = 0
+    game.packets_from_clients.length = 0
 }
 
 function flushplayersToBeDeleted(game) {
     for (const player_id of game.players_to_delete) {
-        game.entities.delete(player_id)
+        game.players.delete(player_id)
         // send DELETE_PLAYER event to all clients
         const event = { tag: 'DELETE_PLAYER', id: player_id }
         game.packet_to_send.events.push(event)
@@ -114,7 +129,7 @@ function flushplayersToBeDeleted(game) {
 
 function transmitToAllClients(game) {
     const json = JSON.stringify(game.packet_to_send)
-    for (const player of game.entities.values()) {
+    for (const player of game.players.values()) {
         player.connection.send(json)
     }
 }

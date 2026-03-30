@@ -16,7 +16,7 @@ export function render_player(game) {
     else if (position.x > previous_position.x) player.look_direction = 'right';
     else if (position.x < previous_position.x) player.look_direction = 'left';
 
-    const spritesheet = game.player_basic_demo;
+    const spritesheet = game.spritesheets.player_basic_demo;
 
     let frame;
     if (position.x !== previous_position.x || position.y !== previous_position.y) {
@@ -38,7 +38,7 @@ export function render_player(game) {
         player.animation_time = 0;
     }
 
-    const draw = Draw.sprite(game.player_basic_demo, frame, position.x, position.y)
+    const draw = Draw.sprite(spritesheet, frame, position.x, position.y)
         .set_depth_bottom();
 
     game.graphics.render_buffered(draw);

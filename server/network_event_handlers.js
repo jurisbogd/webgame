@@ -1,7 +1,7 @@
 export const network_event_handlers = {
     SET_POSITION: (game, sender_id, event) => {
         //Update player position
-        const player = game.entities.get(sender_id);
+        const player = game.players.get(sender_id);
 
         if (!player) return;
 

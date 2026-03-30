@@ -6,6 +6,7 @@ export const network_event_handlers = {
     NEW_ENTITY: new_entity_handler,
     DELETE_PLAYER: delete_player_handler,
     CHAT_MESSAGE: chat_message_handler,
+    SET_ROOM: set_room_handler,
 }
 
 function set_player_id_handler(game, event) {
@@ -50,4 +51,12 @@ function chat_message_handler(game, event) {
     const timestamp = performance.now()
     const message = event.message
     entity.chat_message = { timestamp, message }
+}
+
+function set_room_handler(game, event) {
+    console.log('setting room');
+
+    const room = event.room;
+
+    game.room = room;
 }

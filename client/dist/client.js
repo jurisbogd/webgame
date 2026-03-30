@@ -51,12 +51,15 @@ class Game {
         game.entities = new Map();
 
         game.background_image = await load_image_url(background_image_url);
-        game.tileset = await load_spritesheet('tileset_basic');
         game.player_sprite = await load_image('red_orb32');
-        game.player_basic_demo = await load_spritesheet('player_basic_demo');
 
-        const room = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
-        game.room = room;
+        game.spritesheets = {
+            tileset_basic: await load_spritesheet('tileset_basic'),
+            player_basic_demo: await load_spritesheet('player_basic_demo'),
+        };
+
+        // const room = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
+        // game.room = room;
 
         init_keyboard_input(game.canvas)
 

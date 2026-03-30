@@ -2,6 +2,9 @@ import { Draw } from '../Draw.js';
 
 export function render_room_features(game) {
     const room = game.room;
+
+    if (room === undefined) return;
+
     const features = room.features;
     const graphics = game.graphics;
 
@@ -10,11 +13,12 @@ export function render_room_features(game) {
             const tile = features[i][j];
 
             // ignore missing tiles
-            if (tile === undefined) continue;
+            if (tile === undefined || tile === null) continue;
 
             const x = i * 16;
             const y = j * 16;
-            const draw = Draw.sprite(tile.tileset, tile.id, x, y)
+            const tileset = game.spritesheets[tile.tileset];
+            const draw = Draw.sprite(tileset, tile.id, x, y)
                 .set_depth_bottom(tile.depth_mod);
 
             // buffer draw call for depth sorting

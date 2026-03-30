@@ -2,6 +2,9 @@ import { Draw } from '../Draw.js';
 
 export function render_room_floor(game) {
     const room = game.room;
+
+    if (room === undefined) return;
+
     const floor = room.floor;
     const graphics = game.graphics;
 
@@ -10,11 +13,12 @@ export function render_room_floor(game) {
             const tile = floor[i][j];
 
             // ignore missing tiles
-            if (tile === undefined) continue;
+            if (tile === undefined || tile === null) continue;
 
             const x = i * 16;
             const y = j * 16;
-            const draw = Draw.sprite(tile.tileset, tile.id, x, y);
+            const tileset = game.spritesheets[tile.tileset];
+            const draw = Draw.sprite(tileset, tile.id, x, y);
 
             graphics.render(draw);
         }
