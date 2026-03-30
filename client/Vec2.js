@@ -7,6 +7,10 @@ export class Vec2 {
         this.y = y;
     }
 
+    static zero() {
+        return new Vec2(0, 0);
+    }
+
     get_x() {
         return this.x;
     }
