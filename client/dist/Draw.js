@@ -35,15 +35,6 @@ export class Draw {
         return draw;
     }
 
-    static tile(tileset, tile_id, x, y) {
-        const sprite_rect = tileset.get_tile_sprite_rect(tile_id);
-        const transform = new Rectangle(x, y, sprite_rect.get_width() * 2, sprite_rect.get_height() * 2);
-        const pivot = new Vec2(0, 0);
-        const draw = new Draw(tileset.image, transform, sprite_rect, pivot);
-
-        return draw;
-    }
-
     set_position(x, y) {
         this.transform.set_position(x, y);
 

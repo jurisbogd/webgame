@@ -16,12 +16,6 @@ export async function load_image(name) {
     return image
 }
 
-export async function load_tileset(name) {
-    const image = await load_image(name)
-    const tileset = new Tileset(image)
-    return tileset
-}
-
 export async function load_spritesheet(name) {
     const image = await load_image(name);
 

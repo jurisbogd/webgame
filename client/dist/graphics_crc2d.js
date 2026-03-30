@@ -57,21 +57,6 @@ export class CRC2DGraphics {
         this.ctx.fill()
     }
 
-    draw_tile(tileset, tile_id, x, y) {
-        if (!tileset.has_tile(tile_id)) {
-            return
-        }
-
-        const sprite_rect = tileset.get_tile_sprite_rect(tile_id)
-
-        const width = sprite_rect.get_width()
-        const height = sprite_rect.get_height()
-        const rect_x = sprite_rect.get_x()
-        const rect_y = sprite_rect.get_y()
-
-        this.draw_image(tileset.image, x, y, width, height, rect_x, rect_y, width, height)
-    }
-
     render(draw) {
         this.ctx.drawImage(
             draw.sprite,
