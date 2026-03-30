@@ -38,8 +38,8 @@ export function render_chat_bubbles(game) {
             ? chat_bubbles.get(entity_id)
             : create_chat_bubble(game.ui, entity_id)
 
-        const dx = player_position.x - position.x
-        const dy = player_position.y - position.y
+        const dx = player_position.x - position.x;
+        const dy = player_position.y - position.y;
         const distance = Math.sqrt(dx * dx + dy * dy)
         const distance_threshold = 100 // pixels
 
@@ -58,8 +58,8 @@ export function render_chat_bubbles(game) {
         }
         else {
             chat_bubble.element.style.display = 'block'
-            chat_bubble.element.style.left = `${position.x}px`
-            chat_bubble.element.style.top = `${position.y}px`
+            chat_bubble.element.style.left = `${position.x - game.graphics.viewport.get_left()}px`
+            chat_bubble.element.style.top = `${position.y - game.graphics.viewport.get_top()}px`
         }
     }
 }

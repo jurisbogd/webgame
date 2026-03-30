@@ -111,7 +111,7 @@ const game = await Game.init();
 
 game.chat_input.onkeydown = (event) => {
     if (event.code === 'Enter') {
-        const message = chat_input.value
+        const message = game.chat_input.value
 
         if (message != '') {
             queue_event({ tag: 'CHAT_MESSAGE', message: message })
