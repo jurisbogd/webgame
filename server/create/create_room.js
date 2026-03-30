@@ -3,20 +3,22 @@ import { cantor_pair } from "../math/cantor_pair.js";
 import { mulberry32 } from "../math/mulberry32.js";
 
 export function create_room(i, j) {
-    const seed = cantor_pair(i, j);
-    const [floor, features] = generate_tilemap(seed);
+    // const seed = cantor_pair(i, j);
+    const [floor, features, objects] = generate_tilemap(i, j);
 
     const room = {
         width: floor.length,
         height: floor[0].length,
         floor,
         features,
+        objects,
     }
 
     return room;
 }
 
-function generate_tilemap(seed) {
+function generate_tilemap(i, j) {
+    const seed = cantor_pair(i, j);
     const rng = mulberry32(seed);
     const size = 24 + Math.floor(rng() * 8);
     const floor = init_2d_array(size, size, () => undefined);
@@ -92,5 +94,62 @@ function generate_tilemap(seed) {
         }
     }
 
-    return [floor, features];
+    const room_width = size * 16;
+    const room_height = size * 16;
+
+    const left_door = {
+        type: 'door',
+        tileset: 'doors',
+        id: 'left',
+        x: 40,
+        y: room_height / 2,
+        dest_ord: {
+            i: get_destination_ord(i, -1),
+            j: j,
+        },
+    };
+    const top_door = {
+        type: 'door',
+        tileset: 'doors',
+        id: 'top',
+        x: room_width / 2,
+        y: 72,
+        dest_ord: {
+            i: i,
+            j: get_destination_ord(j, -1),
+        },
+    };
+    const bottom_door = {
+        type: 'door',
+        tileset: 'doors',
+        id: 'bottom',
+        x: room_width / 2,
+        y: room_height - 40,
+        dest_ord: {
+            i: i,
+            j: get_destination_ord(j, 1),
+        },
+    };
+    const right_door = {
+        type: 'door',
+        tileset: 'doors',
+        id: 'right',
+        x: room_width - 40,
+        y: room_height / 2,
+        dest_ord: {
+            i: get_destination_ord(i, 1),
+            j: j,
+        },
+    };
+
+    const objects = [left_door, right_door, bottom_door, top_door];
+
+    return [floor, features, objects];
+}
+
+function get_destination_ord(ord, mod) {
+    const dest = ord + mod;
+    if (dest < 0) return 3;
+    if (dest > 3) return 0;
+    return dest;
 }

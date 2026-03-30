@@ -15,6 +15,7 @@ import { render_room_features } from './render/render_room_features.js';
 import { render_room_floor } from './render/render_room_floor.js';
 import { render_background } from './render/render_background.js';
 import { render_player } from './render/render_player.js';
+import { render_room_objects } from './render/render_room_objects.js';
 
 // set this to address and port of server before running client
 const server_address = 'localhost'
@@ -56,6 +57,7 @@ class Game {
         game.spritesheets = {
             tileset_basic: await load_spritesheet('tileset_basic'),
             player_basic_demo: await load_spritesheet('player_basic_demo'),
+            doors: await load_spritesheet('doors'),
         };
 
         // const room = generate_room(game.tileset, Math.floor(Math.random() * 16), Math.floor(Math.random() * 16));
@@ -95,6 +97,7 @@ function step(game) {
     // draw_tilemap(game)
     render_room_floor(game);
     render_room_features(game);
+    render_room_objects(game);
     render_player(game)
     render_chat_bubbles(game)
     game.graphics.flush_render_buffer();
