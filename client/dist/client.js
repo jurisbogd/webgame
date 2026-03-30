@@ -144,8 +144,6 @@ function render_player(game) {
 
     if (position === undefined || previous_position === undefined) return
 
-    const previous_look_direction = player.look_direction;
-
     if (position.y > previous_position.y) player.look_direction = 'down';
     else if (position.y < previous_position.y) player.look_direction = 'up';
     else if (position.x > previous_position.x) player.look_direction = 'right';
@@ -156,10 +154,6 @@ function render_player(game) {
     let frame;
     if (position.x !== previous_position.x || position.y !== previous_position.y) {
         let animation;
-
-        if (previous_look_direction !== player.look_direction) {
-            player.animation_time = 0;
-        }
 
         if (player.look_direction === 'right') animation = 'walk_right';
         else if (player.look_direction === 'left') animation = 'walk_left';
@@ -174,6 +168,7 @@ function render_player(game) {
         else if (player.look_direction === 'left') frame = 'look_left';
         else if (player.look_direction === 'down') frame = 'look_down';
         else if (player.look_direction === 'up') frame = 'look_up';
+        player.animation_time = 0;
     }
 
     const draw = Draw.sprite(game.player_basic_demo, frame, position.x, position.y)
