@@ -79,8 +79,8 @@ export class CRC2DGraphics {
             draw.sprite_rect.get_y(),
             draw.sprite_rect.get_width(),
             draw.sprite_rect.get_height(),
-            Math.floor(draw.transform.get_x() - draw.pivot.get_x() * draw.transform.get_width() - this.viewport.get_left()),
-            Math.floor(draw.transform.get_y() - draw.pivot.get_y() * draw.transform.get_height() - this.viewport.get_top()),
+            Math.floor(draw.transform.get_x() - draw.pivot.get_x() - this.viewport.get_left()),
+            Math.floor(draw.transform.get_y() - draw.pivot.get_y() - this.viewport.get_top()),
             draw.transform.get_width(),
             draw.transform.get_height()
         )

@@ -66,8 +66,8 @@ export class Draw {
     }
 
     set_pivot(x, y) {
-        this.pivot.set_x(x);
-        this.pivot.set_y(y);
+        this.pivot.set_x(x * this.sprite_rect.get_width());
+        this.pivot.set_y(y * this.sprite_rect.get_height());
 
         return this;
     }
