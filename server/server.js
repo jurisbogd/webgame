@@ -7,7 +7,6 @@ const port = 10799
 const server = new WebSocketServer({ port: port })
 const players = new Map()
 const newPlayers = []
-const playersToBeDeleted = []
 const packetsFromClients = []
 const map = {
     width: 640,
@@ -21,6 +20,8 @@ const game = {
     map: map,
     entities: players,
     packet_to_send: undefined,
+    players_to_delete: [],
+    rooms: new Map(),
 }
 
 server.on('connection', (connection) => {
@@ -35,11 +36,10 @@ server.on('connection', (connection) => {
         y: Math.random() * map.height,
     }
 
-    players.set(id, player)
-
     sendInitializationPacket(connection, id)
 
-    newPlayers.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y, color: 'aqua' })
+    players.set(id, player)
+    newPlayers.push({ tag: 'NEW_ENTITY', id: id, x: player.x, y: player.y })
 
     // packetToBeSent.events.push({ tag: 'NEW_PLAYER', id: id, x: player.x, y: player.y })
 
@@ -49,7 +49,7 @@ server.on('connection', (connection) => {
         packetsFromClients.push(packet)
     }
     connection.onerror = error => console.error(error)
-    connection.onclose = () => playersToBeDeleted.push(id)
+    connection.onclose = () => game.players_to_delete.push(id)
 })
 
 function run() {
@@ -69,7 +69,6 @@ function sendInitializationPacket(connection, id) {
     console.log(json)
 }
 
-let packetToBeSent
 function step(game) {
     // packetToBeSent = { events: [] }
     game.packet_to_send = { events: [] }
@@ -103,14 +102,14 @@ function consumeClientPackets(game) {
 }
 
 function flushplayersToBeDeleted(game) {
-    while (playersToBeDeleted.length > 0) {
-        //Delete player
-        const id = playersToBeDeleted.pop()
-        game.entities.delete(id)
-        //Transmit deletePlayer event to all clients
-        const event = { tag: 'DELETE_PLAYER', id: id }
+    for (const player_id of game.players_to_delete) {
+        game.entities.delete(player_id)
+        // send DELETE_PLAYER event to all clients
+        const event = { tag: 'DELETE_PLAYER', id: player_id }
         game.packet_to_send.events.push(event)
     }
+
+    game.players_to_delete.length = 0
 }
 
 function transmitToAllClients(game) {
