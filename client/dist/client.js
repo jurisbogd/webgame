@@ -8,8 +8,6 @@ import { render_entities } from './render_entities.js';
 import { load_image, load_image_url, load_spritesheet } from './load_image.js'
 import { init_graphics_crc2d } from './graphics_crc2d.js';
 import { Draw } from "./Draw.js";
-import { Tilemap } from './Tilemap.js';
-import { Tile } from './Tile.js'
 import { generate_room } from './generate_map.js';
 import { init_2d_array } from './init_2d_array.js';
 import { Rectangle } from './math/Rectangle.js';
