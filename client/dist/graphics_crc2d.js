@@ -36,33 +36,6 @@ export class CRC2DGraphics {
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height)
     }
 
-    draw_image(image, x, y, width, height, rx, ry, rwidth, rheight) {
-        if (width === undefined || height == undefined) {
-            this.ctx.drawImage(image, x, y)
-        }
-        else if (rx === undefined || ry === undefined || rwidth === undefined || rheight === undefined) {
-            this.ctx.drawImage(image, x, y, width, height)
-        }
-        else {
-            this.ctx.drawImage(image, rx, ry, rwidth, rheight, x, y, width, height)
-        }
-    }
-
-    draw_circle(x, y, size, color, line_width) {
-        this.ctx.strokeStyle = color
-        this.ctx.lineWidth = line_width
-        this.ctx.beginPath()
-        this.ctx.ellipse(x, y, size, size, 0, 0, Math.PI * 2)
-        this.ctx.stroke()
-    }
-
-    draw_filled_circle(x, y, size, color) {
-        this.ctx.fillStyle = color
-        this.ctx.beginPath()
-        this.ctx.ellipse(x, y, size, size, 0, 0, Math.PI * 2)
-        this.ctx.fill()
-    }
-
     /**
      * Immediately render a draw to the canvas.
      * @param {Draw} draw - draw to be rendered.
