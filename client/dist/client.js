@@ -91,7 +91,7 @@ function step(game) {
     // draw_tilemap(game)
     render_room_floor(game);
     render_room_features(game);
-    highlight_player(game)
+    render_player(game)
     render_chat_bubbles(game)
     game.graphics.flush_render_buffer();
 
@@ -133,7 +133,7 @@ function consume_server_packets(game) {
     game.server.received.length = 0
 }
 
-function highlight_player(game) {
+function render_player(game) {
     const player = get_player(game)
 
     if (!player) return
@@ -143,8 +143,9 @@ function highlight_player(game) {
     if (position === undefined) return
 
     const draw = Draw.image(game.player_sprite, position.x, position.y)
-        // .set_pivot(0.5, 0.5)
+        .set_pivot(0.5, 0.5)
         .set_depth_bottom();
+
     game.graphics.render_buffered(draw)
 }
 
