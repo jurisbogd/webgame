@@ -26,11 +26,11 @@ export function update_player(game) {
     if (velocityX !== 0 || velocityY !== 0) {
         position.x += velocityX
         position.y += velocityY
-
-        const event = { tag: 'SET_POSITION', x: position.x, y: position.y, }
-
-        queue_event(event)
     }
+
+    const event = { tag: 'SET_POSITION', x: position.x, y: position.y, };
+
+    queue_event(event);
 }
 
 export function get_player(game) {

@@ -53,7 +53,7 @@ export function render_chat_bubbles(game) {
         }
 
         // render chat bubble
-        if (distance > distance_threshold || dt > chat_message_display_time) {
+        if (entity.room !== game.room.id || distance > distance_threshold || dt > chat_message_display_time) {
             chat_bubble.element.style.display = 'none'
         }
         else {

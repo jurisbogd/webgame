@@ -14,8 +14,9 @@ import { Vec2 } from './math/Vec2.js';
 import { render_room_features } from './render/render_room_features.js';
 import { render_room_floor } from './render/render_room_floor.js';
 import { render_background } from './render/render_background.js';
-import { render_player } from './render/render_player.js';
+import { render_players } from './render/render_player.js';
 import { render_room_objects } from './render/render_room_objects.js';
+import { cantor_pair } from './math/cantor_pair.js';
 
 // set this to address and port of server before running client
 const server_address = 'localhost'
@@ -86,6 +87,7 @@ function step(game) {
 
     consume_server_packets(game)
     update_player(game)
+    check_doors_for_collision(game);
 
     // send all buffered network events to server
     flush_events(game.server.ws)
@@ -98,11 +100,40 @@ function step(game) {
     render_room_floor(game);
     render_room_features(game);
     render_room_objects(game);
-    render_player(game)
+    render_players(game)
     render_chat_bubbles(game)
     game.graphics.flush_render_buffer();
 
     update_keyboard_input()
+}
+
+function check_doors_for_collision(game) {
+    for (const [player_id, player] of game.entities) {
+        if (player_id !== game.player_id) continue;
+
+        if (player.room !== game.room.id) continue;
+
+        for (const object of game.room.objects) {
+            if (object.type !== 'door') continue;
+
+            const dx = object.x - player.position.x;
+            const dy = object.y - player.position.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance > 12) continue;
+
+            const goto_room_event = {
+                tag: 'GOTO_ROOM',
+                dest_ord: object.dest_ord,
+            };
+
+            queue_event(goto_room_event);
+
+            player.room = cantor_pair(object.dest_ord.x, object.dest_ord.y);
+            game.last_entered_door = object.id;
+            console.log(`going to room with ord ${object.dest_ord.i}, ${object.dest_ord.j}`);
+        }
+    }
 }
 
 const game = await Game.init();

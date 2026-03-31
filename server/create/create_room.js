@@ -7,6 +7,7 @@ export function create_room(i, j) {
     const [floor, features, objects] = generate_tilemap(i, j);
 
     const room = {
+        id: cantor_pair(i, j),
         width: floor.length,
         height: floor[0].length,
         floor,

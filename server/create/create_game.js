@@ -4,7 +4,6 @@ import { on_connection } from "./on_connection.js";
 
 export function create_game() {
     const server = create_server();
-    const room = create_room(0, 0);
 
     const game = {
         server,
@@ -13,7 +12,7 @@ export function create_game() {
         packet_to_send: {},
         players_to_delete: [],
         packets_from_clients: [],
-        room,
+        rooms: new Map(),
     };
 
     server.on('connection', (connection) => {

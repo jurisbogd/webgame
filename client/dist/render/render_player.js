@@ -1,10 +1,26 @@
 import { Draw } from '../Draw.js';
 import { get_player } from '../player.js';
 
-export function render_player(game) {
-    const player = get_player(game);
+export function render_players(game) {
+    for (const entity of game.entities.values()) {
+        render_player(game, entity);
 
-    if (!player) return;
+        // console.log(`${entity.room}, ${game.room.id}`);
+    }
+}
+
+function render_player(game, player) {
+    // const player = get_player(game);
+
+    if (!player) {
+        console.log('no player');
+        return;
+    }
+
+    if (player.room !== game.room.id) {
+        console.log('room id mismatch');
+        return;
+    }
 
     const position = player.position;
     const previous_position = player.previous_position;

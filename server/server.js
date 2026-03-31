@@ -78,6 +78,7 @@ function consume_new_players(game) {
         const event = {
             tag: 'NEW_ENTITY',
             id: player_id,
+            room_id: player.room,
             x: player.x,
             y: player.y,
         };
@@ -88,6 +89,13 @@ function consume_new_players(game) {
     game.new_players.length = 0;
 }
 
+function transmit_player_positions(game) {
+    for (const [player_id, player] of game.players) {
+        const set_position_event = { tag: 'SET_POSITION', id: player_id, x: player.x, y: player.y };
+        game.packet_to_send.events.push(set_position_event);
+    }
+}
+
 function step(game) {
     // packetToBeSent = { events: [] }
     game.packet_to_send = { events: [] }
@@ -95,6 +103,7 @@ function step(game) {
     flushplayersToBeDeleted(game)
 
     consume_new_players(game);
+    transmit_player_positions(game);
 
     transmitToAllClients(game)
 }

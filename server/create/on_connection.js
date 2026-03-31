@@ -1,3 +1,5 @@
+import { get_room } from "../get/get_room.js";
+
 let next_network_id = 0;
 
 function get_next_network_id() {
@@ -9,16 +11,18 @@ export function on_connection(game, connection) {
 
     const id = get_next_network_id();
 
-    const room_width = game.room.width * 16;
-    const room_height = game.room.height * 16;
+    const room = get_room(game, { i: 0, j: 0 });
+    const room_width = room.width * 16;
+    const room_height = room.height * 16;
 
     const player = {
         connection: connection,
+        room: room.id,
         x: room_width / 2,
         y: room_height / 2,
     };
 
-    send_initialization_packet(game, connection, id);
+    send_initialization_packet(game, connection, id, room);
 
     game.players.set(id, player);
     game.new_players.push(id);
@@ -32,7 +36,7 @@ export function on_connection(game, connection) {
     connection.onclose = () => game.players_to_delete.push(id);
 }
 
-export function send_initialization_packet(game, connection, network_id) {
+export function send_initialization_packet(game, connection, network_id, room) {
     console.log('sending initialization packet');
 
     const packet = { events: [] };
@@ -40,10 +44,10 @@ export function send_initialization_packet(game, connection, network_id) {
     packet.events.push({ tag: 'SET_PLAYER_ID', id: network_id });
 
     for (const [network_id, player] of game.players) {
-        packet.events.push({ tag: 'NEW_ENTITY', id: network_id, x: player.x, y: player.y })
+        packet.events.push({ tag: 'NEW_ENTITY', id: network_id, x: player.x, y: player.y, room_id: player.room })
     };
 
-    packet.events.push({ tag: 'SET_ROOM', room: game.room });
+    packet.events.push({ tag: 'SET_ROOM', room: room });
 
     const json = JSON.stringify(packet);
     connection.send(json);
