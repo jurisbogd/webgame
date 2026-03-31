@@ -19,12 +19,12 @@ export function create_room(i, j) {
 }
 
 function generate_tilemap(i, j) {
-    const seed = cantor_pair(i, j);
+    const seed = cantor_pair(i * 32, j * 32);
     const rng = mulberry32(seed);
     const size = 24 + Math.floor(rng() * 8);
     const floor = init_2d_array(size, size, () => undefined);
     const features = init_2d_array(size, size, () => undefined);
-    const stone_period = 4 + Math.floor(rng() * 4);
+    const stone_period = 2 + Math.floor(rng() * 8);
     const tileset = 'tileset_basic';
     const wall_center = {
         tileset,
