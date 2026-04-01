@@ -76,23 +76,23 @@ function set_room_handler(game, event) {
 
     if (last_door === 'right') {
         const door = find_object_by_id(room, 'left');
-        player.position.x = door.x + 40;
+        player.position.x = door.x + 20;
         player.position.y = door.y;
     }
     else if (last_door === 'left') {
         const door = find_object_by_id(room, 'right');
-        player.position.x = door.x - 40;
+        player.position.x = door.x - 20;
         player.position.y = door.y;
     }
     else if (last_door === 'top') {
         const door = find_object_by_id(room, 'bottom');
         player.position.x = door.x;
-        player.position.y = door.y - 40;
+        player.position.y = door.y - 20;
     }
     else if (last_door === 'bottom') {
         const door = find_object_by_id(room, 'top');
         player.position.x = door.x;
-        player.position.y = door.y + 40;
+        player.position.y = door.y + 20;
     }
 }
 
