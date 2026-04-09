@@ -1,4 +1,4 @@
-import { Rectangle } from './math/Rectangle.js'
+import { Rect } from './math/Rectangle.js'
 import { Vec2 } from './math/Vec2.js';
 
 function get_sprites(atlas_sprites) {
@@ -18,7 +18,7 @@ function get_sprites(atlas_sprites) {
             continue;
         }
 
-        const rect = new Rectangle(sprite.x, sprite.y, sprite.w, sprite.h);
+        const rect = new Rect(sprite.x, sprite.y, sprite.w, sprite.h);
 
         let pivot;
         if (sprite.pivot_x === undefined || sprite.pivot_y === undefined) {

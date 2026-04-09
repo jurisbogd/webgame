@@ -1,4 +1,4 @@
-import { Rectangle } from "./math/Rectangle.js";
+import { Rect } from "./math/Rectangle.js";
 import { Vec2 } from "./math/Vec2.js";
 
 export class Draw {
@@ -16,8 +16,8 @@ export class Draw {
     }
 
     static image(image, x, y) {
-        const transform = new Rectangle(x, y, image.width, image.height);
-        const sprite_rect = new Rectangle(0, 0, image.width, image.height);
+        const transform = new Rect(x, y, image.width, image.height);
+        const sprite_rect = new Rect(0, 0, image.width, image.height);
         const pivot = Vec2.zero();
 
         const draw = new Draw(image, transform, sprite_rect, pivot);
@@ -26,8 +26,8 @@ export class Draw {
     }
 
     static sprite(spritesheet, id, x, y) {
-        const sprite_rect = Rectangle.copy(spritesheet.get_sprite_rect(id));
-        const transform = new Rectangle(x, y, sprite_rect.get_width(), sprite_rect.get_height());
+        const sprite_rect = Rect.copy(spritesheet.get_sprite_rect(id));
+        const transform = new Rect(x, y, sprite_rect.get_width(), sprite_rect.get_height());
         const sprite_pivot = spritesheet.get_sprite_pivot(id);
         const pivot = new Vec2(sprite_pivot.x, sprite_pivot.y);
 

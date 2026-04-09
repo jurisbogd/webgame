@@ -1,4 +1,4 @@
-export class Rectangle {
+export class Rect {
     x: number
     y: number
     width: number
@@ -13,14 +13,14 @@ export class Rectangle {
 
     /**
      * Copies a rectangle object
-     * @param {Rectangle} rectangle 
-     * @returns {Rectangle}
+     * @param {Rect} rect 
+     * @returns {Rect}
      */
-    static copy(rect: Rectangle): Rectangle {
-        return new Rectangle(rect.x, rect.y, rect.width, rect.height);
+    static copy(rect: Rect): Rect {
+        return new Rect(rect.x, rect.y, rect.width, rect.height);
     }
 
-    contains(rectangle: Rectangle) {
+    contains(rectangle: Rect) {
         return !(
             this.get_bottom() < rectangle.get_top() ||
             this.get_top() > rectangle.get_bottom() ||

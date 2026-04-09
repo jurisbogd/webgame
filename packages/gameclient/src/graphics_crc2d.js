@@ -1,4 +1,4 @@
-import { Rectangle } from './math/Rectangle.js'
+import { Rect } from './math/Rectangle.js'
 
 export async function init_graphics_crc2d(canvas) {
     return new Promise((resolve) => {
@@ -28,7 +28,7 @@ export class CRC2DGraphics {
 
         const viewport_width = canvas.width / render_scale;
         const viewport_height = canvas.height / render_scale;
-        this.viewport = new Rectangle(0, 0, viewport_width, viewport_height);
+        this.viewport = new Rect(0, 0, viewport_width, viewport_height);
     }
 
     clear(color = 'cornflowerblue') {
