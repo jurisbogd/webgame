@@ -1,14 +1,10 @@
-export class Rect {
-    x: number
-    y: number
-    width: number
-    height: number
-
-    constructor(x: number, y: number, width: number, height: number) {
-        this.x = x
-        this.y = y
-        this.width = width
-        this.height = height
+export class Rect extends Float32Array {
+    constructor(x: number, y: number, w: number, h: number) {
+        super(4)
+        this[0] = x;
+        this[1] = y;
+        this[2] = w;
+        this[3] = h;
     }
 
     /**
@@ -17,7 +13,7 @@ export class Rect {
      * @returns {Rect}
      */
     static copy(rect: Rect): Rect {
-        return new Rect(rect.x, rect.y, rect.width, rect.height);
+        return new Rect(rect[0], rect[1], rect[2], rect[3]);
     }
 
     contains(rectangle: Rect) {
@@ -30,60 +26,60 @@ export class Rect {
     }
 
     get_x(): number {
-        return this.x
+        return this[0]
     }
 
     get_y(): number {
-        return this.y
+        return this[1]
     }
 
     get_width(): number {
-        return this.width
+        return this[2]
     }
 
     get_height(): number {
-        return this.height
+        return this[3]
     }
 
     get_right(): number {
-        return this.x + this.width / 2;
+        return this[0] + this[2] / 2;
     }
 
     get_left(): number {
-        return this.x - this.width / 2;
+        return this[0] - this[2] / 2;
     }
 
     get_bottom(): number {
-        return this.y + this.height / 2;
+        return this[1] + this[3] / 2;
     }
 
     get_top(): number {
-        return this.y - this.height / 2;
+        return this[1] - this[3] / 2;
     }
 
     set_x(x: number) {
-        this.x = x
+        this[0] = x
     }
 
     set_y(y: number) {
-        this.y = y
+        this[1] = y
     }
 
     set_position(x: number, y: number) {
-        this.x = x
-        this.y = y
+        this[0] = x
+        this[1] = y
     }
 
     set_width(width: number) {
-        this.width = width
+        this[2] = width
     }
 
     set_height(height: number) {
-        this.height = height
+        this[3] = height
     }
 
     set_size(width: number, height: number) {
-        this.width = width
-        this.height = height
+        this[2] = width
+        this[3] = height
     }
 }
