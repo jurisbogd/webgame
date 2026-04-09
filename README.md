@@ -1,23 +1,13 @@
-### Kliento pusęs paleidimas
+### Paruošimas
 
-Prieš paleidžiant kliento pusę nustatyti `serverAddress` kintamajį `client/client.js` faile į serverio pusės adresą (default `localhost`).
+1. `npm install`
 
-`client` direktorijoje:
+2. `npm run build`
 
-```
-python -m http.server --bind 0.0.0.0
-```
+### Svetainės paleidimas
 
-Paleidimas su custom port reikšme:
+`npm run start:httpserver`
 
-```
-python -m http.server [PORT] --bind 0.0.0.0
-``` 
+### Žaidimo serverio paleidimas
 
-### Serverio pusės paleidimas
-
-`server` direktorijoje:
-
-```
-npm start
-```
+`npm run start:gameserver`

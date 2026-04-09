@@ -11,14 +11,14 @@ export async function load_image_url(url) {
 }
 
 export async function load_image(name) {
-    const image = await load_image_url(`/content/${name}.png`)
+    const image = await load_image_url(`/assets/images/${name}.png`)
     return image
 }
 
 export async function load_spritesheet(name) {
-    const image = await load_image(name);
+    const image = await load_image_url(`/assets/spritesheets/${name}.png`);
 
-    const response = await fetch(`/content/${name}.spriteatlas`);
+    const response = await fetch(`/assets/spritesheets/${name}.spriteatlas`);
     const atlas = await response.json();
 
     const spritesheet = new Spritesheet(image, atlas);
