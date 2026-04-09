@@ -1,10 +1,10 @@
 export class Rectangle {
-    x
-    y
-    width
-    height
+    x: number
+    y: number
+    width: number
+    height: number
 
-    constructor(x, y, width, height) {
+    constructor(x: number, y: number, width: number, height: number) {
         this.x = x
         this.y = y
         this.width = width
@@ -16,11 +16,11 @@ export class Rectangle {
      * @param {Rectangle} rectangle 
      * @returns {Rectangle}
      */
-    static copy(rect) {
+    static copy(rect: Rectangle): Rectangle {
         return new Rectangle(rect.x, rect.y, rect.width, rect.height);
     }
 
-    contains(rectangle) {
+    contains(rectangle: Rectangle) {
         return !(
             this.get_bottom() < rectangle.get_top() ||
             this.get_top() > rectangle.get_bottom() ||
@@ -29,60 +29,60 @@ export class Rectangle {
         )
     }
 
-    get_x() {
+    get_x(): number {
         return this.x
     }
 
-    get_y() {
+    get_y(): number {
         return this.y
     }
 
-    get_width() {
+    get_width(): number {
         return this.width
     }
 
-    get_height() {
+    get_height(): number {
         return this.height
     }
 
-    get_right() {
+    get_right(): number {
         return this.x + this.width / 2;
     }
 
-    get_left() {
+    get_left(): number {
         return this.x - this.width / 2;
     }
 
-    get_bottom() {
+    get_bottom(): number {
         return this.y + this.height / 2;
     }
 
-    get_top() {
+    get_top(): number {
         return this.y - this.height / 2;
     }
 
-    set_x(x) {
+    set_x(x: number) {
         this.x = x
     }
 
-    set_y(y) {
+    set_y(y: number) {
         this.y = y
     }
 
-    set_position(x, y) {
+    set_position(x: number, y: number) {
         this.x = x
         this.y = y
     }
 
-    set_width(width) {
+    set_width(width: number) {
         this.width = width
     }
 
-    set_height(height) {
+    set_height(height: number) {
         this.height = height
     }
 
-    set_size(width, height) {
+    set_size(width: number, height: number) {
         this.width = width
         this.height = height
     }

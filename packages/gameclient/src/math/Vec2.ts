@@ -1,8 +1,8 @@
 export class Vec2 {
-    x;
-    y;
+    x: number;
+    y: number;
 
-    constructor(x, y) {
+    constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
     }
@@ -11,19 +11,19 @@ export class Vec2 {
         return new Vec2(0, 0);
     }
 
-    get_x() {
+    get_x(): number {
         return this.x;
     }
 
-    get_y() {
+    get_y(): number {
         return this.y;
     }
 
-    set_x(x) {
+    set_x(x: number) {
         this.x = x;
     }
 
-    set_y(y) {
+    set_y(y: number) {
         this.y = y;
     }
 }
