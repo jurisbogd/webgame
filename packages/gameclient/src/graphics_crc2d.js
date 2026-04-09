@@ -1,4 +1,4 @@
-import { Rect } from './math/Rectangle.js'
+import { Rect } from './math/Rect.js'
 
 export async function init_graphics_crc2d(canvas) {
     return new Promise((resolve) => {

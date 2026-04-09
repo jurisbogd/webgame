@@ -1,4 +1,4 @@
-import { Rect } from './math/Rectangle.js'
+import { Rect } from './math/Rect.js'
 import { Vec2 } from './math/Vec2.js';
 
 function get_sprites(atlas_sprites) {

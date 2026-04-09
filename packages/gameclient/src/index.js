@@ -9,7 +9,7 @@ import { load_image, load_image_url, load_spritesheet } from './load_image.js'
 import { init_graphics_crc2d } from './graphics_crc2d.js';
 import { generate_room } from './generate_map.js';
 import { init_2d_array } from './init_2d_array.js';
-import { Rect } from './math/Rectangle.js';
+import { Rect } from './math/Rect.js';
 import { Vec2 } from './math/Vec2.js';
 import { render_room_features } from './render/render_room_features.js';
 import { render_room_floor } from './render/render_room_floor.js';
