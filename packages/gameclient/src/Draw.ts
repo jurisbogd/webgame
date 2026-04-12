@@ -19,7 +19,7 @@ export class Draw {
     static image(image: any, x: number, y: number): Draw {
         const transform = new Rect(x, y, image.width, image.height);
         const sprite_rect = new Rect(0, 0, image.width, image.height);
-        const pivot = Vec2.zero();
+        const pivot = Vec2.zero;
 
         const draw = new Draw(image, transform, sprite_rect, pivot);
 
@@ -59,15 +59,15 @@ export class Draw {
     }
 
     set_pivot(x: number, y: number) {
-        this.pivot.set_x(x * this.transform.get_width());
-        this.pivot.set_y(y * this.transform.get_height());
+        this.pivot.x = x * this.transform.get_width();
+        this.pivot.y = y * this.transform.get_height();
 
         return this;
     }
 
     set_pivot_absolute(x: number, y: number) {
-        this.pivot.set_x(x);
-        this.pivot.set_y(y);
+        this.pivot.x = x;
+        this.pivot.y = y;
 
         return this;
     }
@@ -80,7 +80,7 @@ export class Draw {
 
     get_top(): number {
         const y = this.transform.get_y();
-        const pivot_y = this.pivot.get_y();
+        const pivot_y = this.pivot.y;
         const top = y - pivot_y;
 
         return top;
@@ -89,7 +89,7 @@ export class Draw {
     get_bottom(): number {
         const y = this.transform.get_y();
         const height = this.transform.get_height();
-        const pivot_y = this.pivot.get_y();
+        const pivot_y = this.pivot.y;
         const bottom = y + height - pivot_y;
 
         return bottom;
@@ -97,7 +97,7 @@ export class Draw {
 
     get_left(): number {
         const x = this.transform.get_x();
-        const pivot_x = this.pivot.get_x();
+        const pivot_x = this.pivot.x;
         const left = x - pivot_x;
 
         return left;
@@ -106,7 +106,7 @@ export class Draw {
     get_right(): number {
         const x = this.transform.get_x();
         const width = this.transform.get_width();
-        const pivot_x = this.pivot.get_x();
+        const pivot_x = this.pivot.x;
         const right = x + width - pivot_x;
 
         return right;

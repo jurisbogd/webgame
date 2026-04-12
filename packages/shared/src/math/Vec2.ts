@@ -5,14 +5,6 @@ export class Vec2 extends Float32Array {
         this[1] = y;
     };
 
-    static get zero() {
-        return new Vec2(0, 0);
-    };
-
-    static get one() {
-        return new Vec2(1, 1);
-    };
-
     get x() {
         return this[0];
     };

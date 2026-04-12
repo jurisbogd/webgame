@@ -22,7 +22,7 @@ function get_sprites(atlas_sprites) {
 
         let pivot;
         if (sprite.pivot_x === undefined || sprite.pivot_y === undefined) {
-            pivot = Vec2.zero();
+            pivot = Vec2.zero;
         }
         else {
             if (typeof sprite.pivot_x === 'number' && typeof sprite.pivot_y === 'number') {
@@ -30,7 +30,7 @@ function get_sprites(atlas_sprites) {
             }
             else {
                 console.warn(`Optional pivot properties in sprite '${sprite_name}' are defined, but not numbers.`)
-                pivot = Vec2.zero();
+                pivot = Vec2.zero;
             }
         }
 
