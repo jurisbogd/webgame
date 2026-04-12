@@ -1,5 +1,4 @@
-import { Vec2 } from '@jbwg/shared/math'
-import { Rect } from './math/Rect.js'
+import { Rect, Vec2 } from '@jbwg/shared/math'
 
 export async function init_graphics_crc2d(canvas) {
     return new Promise((resolve) => {

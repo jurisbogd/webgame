@@ -1,5 +1,4 @@
-import { Rect } from "./math/Rect.js";
-import { Vec2 } from "@jbwg/shared/math";
+import { Rect, Vec2 } from "@jbwg/shared/math";
 import { Spritesheet } from "./Spritesheet.js";
 
 export class Draw {

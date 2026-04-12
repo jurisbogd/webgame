@@ -16,12 +16,26 @@ body {
 .container {
     display: block;
     margin: 0 auto;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
 }
 
 #game-container {
     margin-top: 20px;
     width: 1280px;
+    height: 720px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+#canvas-container {
+    width: 900px;
+    height: 720px;
+    position: relative;
+}
+
+#chatbox-container {
+    width: 380px;
     height: 720px;
     position: relative;
 }
