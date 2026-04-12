@@ -1,6 +1,6 @@
 import { queue_event } from './event_queue.js'
 import { is_key_down } from './keyboard_input.js'
-import { Vec2 } from './math/Vec2.js'
+import { Vec2 } from '@jbwg/shared/math'
 
 export function update_player(game) {
     const player = get_player(game)

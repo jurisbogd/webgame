@@ -1,4 +1,4 @@
-import { Vec2 } from "./math/Vec2.js"
+import { Vec2 } from "@jbwg/shared/math"
 import { set_player_id, get_player_id, get_player } from "./player.js"
 
 export const network_event_handlers = {

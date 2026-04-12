@@ -8,7 +8,8 @@
   "private": false,
   "type": "module",
   "exports": {
-    "./utils": "./dist/utils.js"
+    "./utils": "./dist/utils.js",
+    "./math": "./dist/math.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

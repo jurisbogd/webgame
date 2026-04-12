@@ -1,4 +1,4 @@
-import { Vec2 } from "./math/Vec2.js";
+import { Vec2 } from "@jbwg/shared/math";
 import { isDefined, isNumber, parse } from "@jbwg/shared/utils"
 
 export type NetworkPacket =

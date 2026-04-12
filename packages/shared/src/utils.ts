@@ -1,4 +1,4 @@
-import { Vec2 } from "./math/Vec2";
+import { Vec2 } from "./math.js";
 
 export function isDefined<T>(o: T | undefined): o is T {
     return o !== undefined;
