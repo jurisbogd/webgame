@@ -9,7 +9,7 @@ body {
 
 #main-column {
     background-color: #1a1a1a;
-    width: 700px;
+    width: 1300px;
     min-height: 100vh;
 }
 
@@ -21,8 +21,8 @@ body {
 
 #game-container {
     margin-top: 20px;
-    width: 640px;
-    height: 480px;
+    width: 1280px;
+    height: 720px;
     position: relative;
 }
 

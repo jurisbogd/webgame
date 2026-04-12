@@ -1,3 +1,5 @@
+import { Vec2 } from "@jbwg/shared/math";
+
 export class Rect extends Float32Array {
     constructor(x: number, y: number, w: number, h: number) {
         super(4)
@@ -13,73 +15,81 @@ export class Rect extends Float32Array {
      * @returns {Rect}
      */
     static copy(rect: Rect): Rect {
-        return new Rect(rect[0], rect[1], rect[2], rect[3]);
+        return new Rect(rect.x, rect.y, rect.w, rect.h);
     }
 
     contains(rectangle: Rect) {
         return !(
-            this.get_bottom() < rectangle.get_top() ||
-            this.get_top() > rectangle.get_bottom() ||
-            this.get_right() < rectangle.get_left() ||
-            this.get_left() > rectangle.get_right()
+            this.bottom < rectangle.top ||
+            this.top > rectangle.bottom ||
+            this.right < rectangle.left ||
+            this.left > rectangle.right
         )
     }
 
-    get_x(): number {
-        return this[0]
-    }
+    get x() {
+        return this[0];
+    };
 
-    get_y(): number {
-        return this[1]
-    }
+    set x(value: number) {
+        this[0] = value;
+    };
 
-    get_width(): number {
-        return this[2]
-    }
+    get y() {
+        return this[1];
+    };
 
-    get_height(): number {
-        return this[3]
-    }
+    set y(value: number) {
+        this[1] = value;
+    };
 
-    get_right(): number {
-        return this[0] + this[2] / 2;
-    }
+    get position() {
+        return new Vec2(this.x, this.y);
+    };
 
-    get_left(): number {
-        return this[0] - this[2] / 2;
-    }
+    set position(value: Vec2) {
+        this.x = value.x;
+        this.y = value.y;
+    };
 
-    get_bottom(): number {
-        return this[1] + this[3] / 2;
-    }
+    get w() {
+        return this[2];
+    };
 
-    get_top(): number {
-        return this[1] - this[3] / 2;
-    }
+    set w(value: number) {
+        this[2] = value;
+    };
 
-    set_x(x: number) {
-        this[0] = x
-    }
+    get h() {
+        return this[3];
+    };
 
-    set_y(y: number) {
-        this[1] = y
-    }
+    set h(value: number) {
+        this[3] = value;
+    };
 
-    set_position(x: number, y: number) {
-        this[0] = x
-        this[1] = y
-    }
+    get size() {
+        return new Vec2(this.w, this.h);
+    };
 
-    set_width(width: number) {
-        this[2] = width
-    }
+    set size(value: Vec2) {
+        this.w = value.x;
+        this.h = value.y;
+    };
 
-    set_height(height: number) {
-        this[3] = height
-    }
+    get right() {
+        return this.x + this.w / 2;
+    };
 
-    set_size(width: number, height: number) {
-        this[2] = width
-        this[3] = height
-    }
+    get left() {
+        return this.x - this.w / 2;
+    };
+
+    get bottom() {
+        return this.y + this.h / 2;
+    };
+
+    get top() {
+        return this.y - this.h / 2;
+    };
 }

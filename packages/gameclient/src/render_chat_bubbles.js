@@ -58,8 +58,8 @@ export function render_chat_bubbles(game) {
         }
         else {
             chat_bubble.element.style.display = 'block'
-            const position_x = (position.x - game.graphics.viewport.get_left()) * game.graphics.render_scale;
-            const position_y = (position.y - game.graphics.viewport.get_top()) * game.graphics.render_scale - 40;
+            const position_x = (position.x - game.graphics.viewport.left) * game.graphics.render_scale;
+            const position_y = (position.y - game.graphics.viewport.top) * game.graphics.render_scale - 40;
             chat_bubble.element.style.left = `${position_x}px`
             chat_bubble.element.style.top = `${position_y}px`
         }

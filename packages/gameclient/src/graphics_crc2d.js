@@ -1,3 +1,4 @@
+import { Vec2 } from '@jbwg/shared/math'
 import { Rect } from './math/Rect.js'
 
 export async function init_graphics_crc2d(canvas) {
@@ -81,19 +82,19 @@ export class CRC2DGraphics {
     }
 
     #render(draw) {
-        const position_x = draw.get_left() - this.viewport.get_left();
-        const position_y = draw.get_top() - this.viewport.get_top();
+        const position_x = draw.get_left() - this.viewport.left;
+        const position_y = draw.get_top() - this.viewport.top;
         const position_x_scaled = Math.floor(position_x) * this.render_scale;
         const position_y_scaled = Math.floor(position_y) * this.render_scale;
-        const width_scaled = draw.transform.get_width() * this.render_scale;
-        const height_scaled = draw.transform.get_height() * this.render_scale;
+        const width_scaled = draw.transform.w * this.render_scale;
+        const height_scaled = draw.transform.h * this.render_scale;
 
         this.ctx.drawImage(
             draw.sprite,
-            draw.sprite_rect.get_x(),
-            draw.sprite_rect.get_y(),
-            draw.sprite_rect.get_width(),
-            draw.sprite_rect.get_height(),
+            draw.sprite_rect.x,
+            draw.sprite_rect.y,
+            draw.sprite_rect.w,
+            draw.sprite_rect.h,
             position_x_scaled,
             position_y_scaled,
             width_scaled,
@@ -105,14 +106,14 @@ export class CRC2DGraphics {
         // return this.viewport.contains(draw.transform);
         const viewport = this.viewport;
         return !(
-            viewport.get_bottom() < draw.get_top() ||
-            viewport.get_top() > draw.get_bottom() ||
-            viewport.get_right() < draw.get_left() ||
-            viewport.get_left() > draw.get_right()
+            viewport.bottom < draw.get_top() ||
+            viewport.top > draw.get_bottom() ||
+            viewport.right < draw.get_left() ||
+            viewport.left > draw.get_right()
         );
     }
 
     set_viewport_position(x, y) {
-        this.viewport.set_position(x, y);
+        this.viewport.position = new Vec2(x, y);
     }
 }
