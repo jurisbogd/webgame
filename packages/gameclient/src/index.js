@@ -154,7 +154,7 @@ function consume_server_packets(game) {
     //Consume packets from server
     for (const packet of game.server.received) {
         for (const event of packet.events) {
-            console.log(`received event with tag ${event.tag}`);
+            // console.log(`received event with tag ${event.tag}`);
 
             const event_handler = network_event_handlers[event.tag]
 
@@ -162,7 +162,8 @@ function consume_server_packets(game) {
                 event_handler(game, event)
             }
             else {
-                console.log(`packet with unknown event tag ${event.tag} received`)
+                // console.log(`packet with unknown event tag ${event.tag} received`)
+                console.log(event);
             }
         }
     }

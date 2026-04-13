@@ -18,14 +18,17 @@ function set_player_id_handler(game, event) {
 }
 
 function set_position_handler(game, event) {
-    if (event.id === get_player_id(game)) return
 
-    const entity = game.entities.get(event.id)
+    const packet = event;
+
+    if (packet.id === get_player_id(game)) return
+
+    const entity = game.entities.get(packet.id)
 
     if (!entity) return
 
     entity.previous_position = new Vec2(entity.position.x, entity.position.y);
-    entity.position = { x: event.x, y: event.y }
+    entity.position = { x: packet.x, y: packet.y }
 }
 
 function new_entity_handler(game, event) {

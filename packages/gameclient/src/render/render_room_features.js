@@ -13,7 +13,7 @@ export function render_room_features(game) {
             const tile = features[i][j];
 
             // ignore missing tiles
-            if (tile === undefined || tile === null) continue;
+            if (tile.tileset === "" || tile.id === "") continue;
 
             const x = i * 16;
             const y = j * 16;

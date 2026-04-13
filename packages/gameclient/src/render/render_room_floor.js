@@ -12,6 +12,8 @@ export function render_room_floor(game) {
         for (let i = 0; i < room.width; ++i) {
             const tile = floor[i][j];
 
+            if (tile.id === "" || tile.tileset === "") continue;
+
             // ignore missing tiles
             if (tile === undefined || tile === null) continue;
 
