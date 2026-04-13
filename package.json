@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @jbwg/shared && npm run build -w @jbwg/gameclient && npm run build -w @jbwg/gameserver && npm run build -w @jbwg/httpserver",
+    "build": "npm run build -w @jbwg/shared && npm run build -w @jbwg/leveleditor && npm run build -w @jbwg/gameclient && npm run build -w @jbwg/gameserver && npm run build -w @jbwg/httpserver",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:gameserver": "npm run start -w @jbwg/gameserver",
     "start:httpserver": "npm run start -w @jbwg/httpserver"

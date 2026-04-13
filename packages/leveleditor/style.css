@@ -1,0 +1,125 @@
+body {
+    font: 10pt "Verdana", sans-serif;
+    background-color: #222222;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+}
+
+#main-column {
+    background-color: #1a1a1a;
+    width: 1300px;
+    min-height: 100vh;
+}
+
+.container {
+    display: block;
+    margin: 0 auto;
+    /* margin-bottom: 20px; */
+}
+
+#game-container {
+    margin-top: 20px;
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    outline: 1px solid #2f2f2f;
+}
+
+#canvas-container {
+    width: 900px;
+    height: 720px;
+    position: relative;
+}
+
+#control-panel-container {
+    width: 380px;
+    height: 720px;
+    padding: 5px;
+    box-sizing: border-box;
+    position: relative;
+    outline: 1px solid #2f2f2f;
+}
+
+#control-panel {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    outline: 1px solid #2f2f2f;
+    background-color: #111111;
+}
+
+.control {
+    width: 100%;
+    border: none;
+    color: gray;
+    text-align: left;
+    background-color: transparent;
+    font: inherit;
+}
+
+.control:hover {
+    color: lightgray;
+    background-color: #2f2f2f;
+}
+
+.control:active {
+    background-color: #404040;
+}
+
+#ui,
+canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+}
+
+canvas:focus {
+    outline: none;
+    /* box-shadow: none; */
+}
+
+#ui {
+    pointer-events: none;
+}
+
+.chat-bubble {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    text-align: center;
+    width: max-content;
+    flex-shrink: 0;
+    max-width: 200px;
+    color: white;
+}
+
+#chat-container {
+    width: 50%;
+}
+
+#chat-input {
+    width: 100%;
+    margin: 0 auto;
+    border: 1px solid gray;
+    background-color: transparent;
+    color: white;
+    font: inherit;
+}
+
+#chat-input:focus {
+    outline: 2px solid lightblue;
+}
+
+.control-section-header {
+    display: block;
+    font-weight: bold;
+    text-transform: capitalize;
+    /* font-variant: small-caps; */
+}
