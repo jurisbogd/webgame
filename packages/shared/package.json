@@ -9,7 +9,8 @@
   "type": "module",
   "exports": {
     "./utils": "./dist/utils.js",
-    "./math": "./dist/math.js"
+    "./math": "./dist/math.js",
+    "./parser": "./dist/parser.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
