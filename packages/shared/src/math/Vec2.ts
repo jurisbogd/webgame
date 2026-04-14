@@ -5,6 +5,10 @@ export class Vec2 extends Float32Array {
         this[1] = y;
     };
 
+    static copy(v: Vec2) {
+        return new Vec2(v.x, v.y);
+    };
+
     static get zero() {
         return new Vec2(0, 0);
     };

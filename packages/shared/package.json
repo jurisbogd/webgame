@@ -10,7 +10,8 @@
   "exports": {
     "./utils": "./dist/utils.js",
     "./math": "./dist/math.js",
-    "./parser": "./dist/parser.js"
+    "./parser": "./dist/parser.js",
+    "./graphics": "./dist/graphics.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

@@ -1,4 +1,5 @@
 import { Parser } from "./Parser";
+import { parserSuccess } from "./parserSuccess";
 
 export function defaultParser<T>(parser: Parser<T>, defaultValue: () => T) {
     return (x: any) => {
@@ -8,10 +9,7 @@ export function defaultParser<T>(parser: Parser<T>, defaultValue: () => T) {
             return result;
         }
         else {
-            return {
-                success: true,
-                value: defaultValue(),
-            };
+            return parserSuccess(defaultValue());
         };
     };
 };

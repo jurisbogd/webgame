@@ -1,10 +1,12 @@
+import { parserFail } from "./parserFail";
 import { ParserResult } from "./ParserResult";
+import { parserSuccess } from "./parserSuccess";
 
-export function numberParser(o: any): ParserResult<number> {
-    if (typeof o === "number") {
-        return { success: true, value: o as number };
+export function numberParser(x: any): ParserResult<number> {
+    if (typeof x === "number") {
+        return parserSuccess(x);
     }
     else {
-        return { success: false };
+        return parserFail();
     };
 };

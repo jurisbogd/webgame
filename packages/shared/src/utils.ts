@@ -13,3 +13,5 @@ export function isString(o: unknown) {
 export function isNumber(o: unknown) {
     return typeof o === "number";
 };
+
+export { SpatialMap } from "./room/Room";

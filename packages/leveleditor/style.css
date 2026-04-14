@@ -13,6 +13,14 @@ body {
     min-height: 100vh;
 }
 
+input[type="text"] {
+    border: 1px solid #2f2f2f;
+    background-color: #000000;
+    /* color: #ffffff; */
+    /* optional, for readability */
+    /* padding: 6px; */
+}
+
 .container {
     display: block;
     margin: 0 auto;
@@ -50,23 +58,75 @@ body {
     box-sizing: border-box;
     outline: 1px solid #2f2f2f;
     background-color: #111111;
+    overflow: auto;
 }
 
-.control {
+.control-row {
+    padding: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
     width: 100%;
     border: none;
-    color: gray;
+    color: #a0a0a0;
     text-align: left;
     background-color: transparent;
     font: inherit;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
 }
 
-.control:hover {
-    color: lightgray;
-    background-color: #2f2f2f;
+.control {
+    border: none;
+    flex: 1;
+    color: #aaaaaa;
+    text-align: left;
+    font: inherit;
+    box-sizing: border-box;
 }
 
-.control:active {
+/* button control */
+
+.control-button {
+    text-align: center;
+    outline: 1px solid #2f2f2f;
+    background-color: #404040;
+}
+
+.control-button:hover {
+    color: #cccccc;
+    background-color: #505050;
+}
+
+.control-button:active {
+    background-color: #606060;
+}
+
+.control-button.disabled {
+    pointer-events: none;
+    color: #555555;
+    background-color: #111111;
+}
+
+/* number/text input control */
+
+.control-input {
+    border: none;
+    outline: 1px solid #2f2f2f;
+    background-color: #111111;
+}
+
+.control-input:hover {
+    color: #cccccc;
+    background-color: #222222;
+}
+
+.control-input:active {
+    background-color: #404040;
+}
+
+.control-input:focus {
+    color: #cccccc;
     background-color: #404040;
 }
 
@@ -104,22 +164,44 @@ canvas:focus {
     width: 50%;
 }
 
-#chat-input {
-    width: 100%;
-    margin: 0 auto;
-    border: 1px solid gray;
-    background-color: transparent;
-    color: white;
-    font: inherit;
+button {
+    all: unset;
+    cursor: pointer;
 }
 
-#chat-input:focus {
-    outline: 2px solid lightblue;
+input {
+    all: unset;
+    cursor: pointer;
+}
+
+/* control section styling */
+
+.control-section {
+    border-bottom: 1px solid #2f2f2f;
 }
 
 .control-section-header {
     display: block;
     font-weight: bold;
-    text-transform: capitalize;
+    cursor: pointer;
+    border-bottom: 1px solid #2f2f2f;
+    /* text-transform: uppercase; */
     /* font-variant: small-caps; */
+}
+
+details {
+    margin: 0;
+    padding: 0;
+}
+
+details>summary {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    /* removes marker space in some browsers */
+}
+
+details>*:not(summary) {
+    margin-left: 0;
+    padding-left: 0;
 }

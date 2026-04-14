@@ -9,15 +9,27 @@ import { taggedUnionParser } from "./parser/taggedUnionParser"
 import { arrayParser } from "./parser/arrayParser"
 import { array2dParser } from "./parser/array2dParser"
 import { defaultParser } from "./parser/defaultParser"
+import { parserSuccess } from "./parser/parserSuccess"
+import { parserFail } from "./parser/parserFail"
+import { mapParser } from "./parser/mapParser"
+import { rectParser } from "./parser/rectParser"
 
 export const parser = {
-    compose: composeParser,
     number: numberParser,
     string: stringParser,
-    vec2: vec2Parser,
+
     stringLiteral: stringLiteralParser,
+    vec2: vec2Parser,
+    rect: rectParser,
+
     taggedUnion: taggedUnionParser,
+    compose: composeParser,
+    default: defaultParser,
+
     array: arrayParser,
     array2d: array2dParser,
-    default: defaultParser,
+    map: mapParser,
+
+    success: parserSuccess,
+    fail: parserFail,
 }

@@ -1,6 +1,8 @@
 import { isNotNullOrUndefined } from "../utils.js";
 import { Parser } from "./Parser.js";
+import { parserFail } from "./parserFail.js";
 import { ParserResult } from "./ParserResult.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function composeParser<
     ParserShape extends Record<string, Parser<any>>,
@@ -11,7 +13,7 @@ export function composeParser<
 ): Parser<Result> {
     return (input: any) => {
         if (!isNotNullOrUndefined(input)) {
-            return { success: false }
+            return parserFail();
         }
 
         const out: any = {};
@@ -20,16 +22,14 @@ export function composeParser<
             const result = shape[key](input[key]);
 
             if (!result.success) {
-                return { success: false }
+                return parserFail();
             }
 
             out[key] = result.value;
         }
 
         const final = transform ? transform(out) : out;
-        return {
-            success: true,
-            value: final,
-        };
+
+        return parserSuccess(final);
     };
 }

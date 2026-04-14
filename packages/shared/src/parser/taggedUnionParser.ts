@@ -1,6 +1,8 @@
 import { isNotNullOrUndefined } from "../utils";
 import { Parser } from "./Parser";
+import { parserFail } from "./parserFail";
 import { stringParser } from "./stringParser";
+import { parserSuccess } from "./parserSuccess";
 
 type TaggedUnionParserResult<
     TagField extends string,
@@ -24,27 +26,24 @@ export function taggedUnionParser<
         const tag = stringParser(x[tagField]);
 
         if (!tag.success) {
-            return { success: false };
+            return parserFail();
         };
 
         const parser = parsers[tag.value];
 
         if (!parser) {
-            return { success: false };
+            return parserFail();
         };
 
         const result = parser(x);
 
         if (!result.success) {
-            return { success: false };
+            return parserFail();
         };
 
-        return {
-            success: true,
-            value: {
-                ...result.value,
-                [tagField]: tag.value,
-            },
-        };
-    }
+        return parserSuccess({
+            ...result.value,
+            [tagField]: tag.value,
+        });
+    };
 }

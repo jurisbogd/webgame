@@ -1,6 +1,7 @@
 import { Vec2 } from "@jbwg/shared/math";
+import { IRect } from "./IRect";
 
-export class Rect extends Float32Array {
+export class Rect extends Float32Array implements IRect {
     constructor(x: number, y: number, w: number, h: number) {
         super(4)
         this[0] = x;

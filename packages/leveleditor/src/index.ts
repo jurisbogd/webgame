@@ -1,129 +1,178 @@
-let Room = {};
+import { ControlSection } from "./control/ControlSection";
+import { ControlButton } from "./control/ControlButton";
+import { Vec2 } from "@jbwg/shared/math";
+import { SpatialMap } from "@jbwg/shared/utils";
+import { ViewModel } from "./ViewModel";
+import { ControlText } from "./control/ControlText";
 
-type ButtonType =
-    | "button"
-    | "submit"
-    | "reset";
+let saved: boolean = true;
 
-function createButton(content: string, type: ButtonType = "button") {
-    const button = document.createElement("button");
+const savedViewModel = new ViewModel<boolean>(
+    () => saved,
+    (value: boolean) => saved = value
+);
 
-    button.classList.add("control");
-    button.type = type;
-    button.textContent = content;
+let room: Room | undefined;
 
-    return button;
+type Room = {
+    name: string;
+    chunkMap: SpatialMap<Chunk>;
 };
 
-function createCheckbox(...classes: string[]) {
-    const checkbox = document.createElement("input");
-
-    checkbox.type = "checkbox";
-
-    for (const c of classes) {
-        checkbox.classList.add(c);
-    }
-
-    return checkbox;
-}
-
-type InputType =
-    | "checkbox";
-
-function createInput(type: InputType, ...classes: string[]) {
-    const input = document.createElement("input");
-
-    input.type = "checkbox";
-
-    for (const c of classes) {
-        input.classList.add(c);
-    }
-
-    return input;
-}
-
-function createLabel(...classes: string[]) {
-    const label = document.createElement("label");
-
-    for (const c of classes) {
-        label.classList.add(c);
-    }
-
-    return label;
-}
-
-function createHTMLElement(name: string, ...classes: string[]) {
-    const element = document.createElement(name);
-
-    for (const c of classes) {
-        element.classList.add(c);
-    }
-
-    return element;
-}
-
-function createDiv(...classes: string[]) {
-    const div = document.createElement("div");
-
-    for (const c of classes) {
-        div.classList.add(c);
-    }
-
-    return div;
-}
-
-interface UIElement {
-    top: HTMLElement;
-    bottom: HTMLElement;
+type Chunk = {
+    flatLayers: TileLayer<Tile>[];
+    featureLayers: TileLayer<Feature>[];
 };
 
-class DropdownSection implements UIElement {
-    details: HTMLDetailsElement;
-    content: HTMLDivElement;
+type TileLayer<T> = {
+    offset: Vec2;
+    tiles: T[][];
+};
 
-    constructor(title: string) {
-        this.details = document.createElement("details");
-        this.details.open = true;
+type Tile = {
+    tileset: string;
+    id: string;
+};
 
-        const summary = document.createElement("summary");
-        summary.classList.add("control");
-        summary.classList.add("control-section-header");
-        summary.textContent = title;
-        this.details.append(summary);
+type Feature = {
+    tileset: string;
+    id: string;
+    z: number;
+};
 
-        this.content = createDiv();
-        this.details.appendChild(this.content);
+const controlPanel = document.getElementById("control-panel");
+
+if (!controlPanel) {
+    throw new Error(`Unable to find element with id 'control-panel'`);
+};
+
+const filePanel = new ControlSection("File");
+controlPanel.appendChild(filePanel.top);
+
+let roomPanel: ControlSection | undefined;
+
+const newFileButton = new ControlButton("New room");
+newFileButton.addClickListener(() => {
+    room = {
+        name: "New room",
+        chunkMap: new SpatialMap<Chunk>(),
     };
 
-    get top() {
-        return this.details;
+    if (roomPanel) {
+        controlPanel.removeChild(roomPanel.top);
+        roomPanel = undefined;
     };
 
-    get bottom() {
-        return this.content;
-    };
-};
+    roomPanel = new ControlSection("Room");
+    controlPanel.appendChild(roomPanel.top);
 
-function appendUIElement(parent: UIElement, child: UIElement) {
-    parent.bottom.appendChild(child.top);
-};
+    const roomNameViewModel = ViewModel.forProperty(room, "name");
+    const roomNameControl = new ControlText("Room name", roomNameViewModel);
+    roomPanel.append(roomNameControl);
 
-function getControlPanel() {
-    return document.getElementById("control-panel");
-};
+    savedViewModel.property = false;
+});
+filePanel.append(newFileButton);
 
-const controlPanel = getControlPanel();
+const saveFileButton = new ControlButton("Save room");
 
-// const roomSection = createControlSection("Room", "room");
+savedViewModel.addChangeListener((value) => {
+    saveFileButton.setDisable(value);
+});
 
-const roomDropdown = new DropdownSection("Room");
+saveFileButton.setDisable(true);
+filePanel.append(saveFileButton);
 
-controlPanel?.appendChild(roomDropdown.details);
+// const openFileButton = new Button("Open");
+// filePanel.append(openFileButton);
 
-const newRoomButton = createButton("New");
 
-roomDropdown.content.appendChild(newRoomButton);
+// function getControlPanel() {
+//     return document.getElementById("control-panel");
+// };
 
-const openRoomButton = createButton("Open");
+// const controlPanel = getControlPanel();
 
-roomDropdown.content.appendChild(openRoomButton);
+// let roomDropdown = new DropdownSection("Room");
+
+// controlPanel?.appendChild(roomDropdown.top);
+
+// const newRoomButton = new Button("New");
+// const openRoomButton = new Button("Open");
+
+// newRoomButton.addClickListener(() => {
+//     room = {
+//         name: "New room",
+//         chunkMap: new SpatialMap<Chunk>(),
+//     };
+
+//     const roomNameViewModel = ViewModel.forProperty(room, "name");
+
+//     const roomNameTextInput = document.createElement("input");
+//     roomNameTextInput.type = "text";
+//     roomNameTextInput.value = roomNameViewModel.property;
+//     roomNameTextInput.addEventListener("input", () => {
+//         roomNameViewModel.property = roomNameTextInput.value;
+//     });
+//     roomNameViewModel.addChangeListener((value: string) => {
+//         roomNameTextInput.value = value;
+//     });
+//     roomNameTextInput.classList.add("control");
+//     roomDropdown.bottom.appendChild(roomNameTextInput);
+// });
+
+// roomDropdown.append(newRoomButton);
+// roomDropdown.append(openRoomButton);
+
+// function addFeatureLayer(chunk: Chunk) {
+//     const tiles = init2dArray(16, 16, newFeature);
+//     const offset = Vec2.zero;
+
+//     const layer = {
+//         offset,
+//         tiles,
+//     };
+
+//     chunk.featureLayers.push(layer);
+// };
+
+// function addFlatLayer(chunk: Chunk) {
+//     const tiles = init2dArray(16, 16, newTile);
+//     const offset = Vec2.zero;
+
+//     const layer = {
+//         offset,
+//         tiles,
+//     };
+
+//     chunk.flatLayers.push(layer);
+// };
+
+
+// function newFeature() {
+//     return {
+//         tileset: "",
+//         id: "",
+//         z: 0,
+//     };
+// };
+
+// function newTile() {
+//     return {
+//         tileset: "",
+//         id: "",
+//     };
+// };
+
+// function init2dArray<T>(width: number, height: number, item: () => T) {
+//     return Array(width).map(() => Array(height).map(item));
+// };
+
+// type Tile = {
+//     tileset: string;
+//     id: string;
+// };
+
+// // newRoomButton.addClickListener(() => {
+// //     room = new Room();
+// // });

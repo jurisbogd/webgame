@@ -1,10 +1,12 @@
 import { isNotNullOrUndefined } from "../utils";
 import { Parser } from "./Parser";
+import { parserFail } from "./parserFail";
+import { parserSuccess } from "./parserSuccess";
 
 export function arrayParser<T>(itemParser: Parser<T>): Parser<T[]> {
     return (xs: any) => {
         if (!isNotNullOrUndefined(xs) || !Array.isArray(xs)) {
-            return { success: false };
+            return parserFail();
         };
 
         const values = [];
@@ -13,15 +15,12 @@ export function arrayParser<T>(itemParser: Parser<T>): Parser<T[]> {
             const result = itemParser(x);
 
             if (!result.success) {
-                return { success: false };
+                return parserFail();
             }
 
             values.push(result.value);
         };
 
-        return {
-            success: true,
-            value: values,
-        };
+        return parserSuccess(values);
     }
 }
