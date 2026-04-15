@@ -1,6 +1,7 @@
 import { IRect, Rect, Vec2 } from "@jbwg/shared/math";
 import { ISpritesheet } from "./ISpritesheet";
 import { isNotNullOrUndefined } from "../utils";
+import { ITileset } from "./ITileset";
 
 export class Draw implements IRect {
     pivot;
@@ -41,6 +42,22 @@ export class Draw implements IRect {
 
         return draw;
     };
+
+    static tile(tileset: ITileset, id: number, position: Vec2) {
+        const image = tileset.image;
+        const spriteRect = tileset.getSpriteRect(id);
+
+        if (!isNotNullOrUndefined(spriteRect)) {
+            return undefined;
+        };
+
+        const transform = new Rect(position.x, position.y, spriteRect.w, spriteRect.h);
+        const pivot = Vec2.zero;
+
+        const draw = new Draw(image, transform, spriteRect, pivot);
+
+        return draw;
+    }
 
     get position() {
         return this.transform.position;

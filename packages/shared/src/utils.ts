@@ -15,3 +15,4 @@ export function isNumber(o: unknown) {
 };
 
 export { SpatialMap } from "./room/Room";
+export { init2dArray } from "./room/Room";

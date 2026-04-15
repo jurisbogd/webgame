@@ -38,13 +38,14 @@ input[type="text"] {
 }
 
 #canvas-container {
-    width: 900px;
+    width: 680px;
     height: 720px;
     position: relative;
 }
 
-#control-panel-container {
-    width: 380px;
+#control-panel-container,
+#tileset-panel-container {
+    width: 300px;
     height: 720px;
     padding: 5px;
     box-sizing: border-box;
@@ -52,7 +53,17 @@ input[type="text"] {
     outline: 1px solid #2f2f2f;
 }
 
-#control-panel {
+/* #tileset-panel-container {
+    width: 380px;
+    height: 720px;
+    padding: 5px;
+    box-sizing: border-box;
+    position: relative;
+    outline: 1px solid #2f2f2f;
+} */
+
+#control-panel,
+#tileset-panel {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -145,6 +156,22 @@ canvas:focus {
 
 #ui {
     pointer-events: none;
+}
+
+#canvas-overlay {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.highlight {
+    position: absolute;
+    transform: translate(0%, 0%);
+    pointer-events: none;
+    background-color: transparent;
+    outline: 2px solid transparent;
 }
 
 .chat-bubble {

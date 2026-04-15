@@ -22,7 +22,7 @@ export class ControlText extends ControlBase {
             viewModel.property = this.input.value;
         });
         viewModel.addChangeListener((value: string) => {
-            this.input.value = viewModel.property;
+            this.input.value = value;
         });
         this.input.value = viewModel.property;
 
