@@ -1,12 +1,12 @@
 import { isNotNullOrUndefined } from "../utils";
 import { Parser } from "./Parser";
-import { parserFail } from "./parserFail";
+import { parserFail, parserRefail } from "./parserFail";
 import { parserSuccess } from "./parserSuccess";
 
-export function arrayParser<T>(itemParser: Parser<T>): Parser<T[]> {
+export function arrayParser<T>(itemParser: Parser<T>, skipFailed?: boolean): Parser<T[]> {
     return (xs: any) => {
         if (!isNotNullOrUndefined(xs) || !Array.isArray(xs)) {
-            return parserFail();
+            return parserFail("Expected array, got undefined");
         };
 
         const values = [];
@@ -14,13 +14,14 @@ export function arrayParser<T>(itemParser: Parser<T>): Parser<T[]> {
         for (const x of xs) {
             const result = itemParser(x);
 
-            if (!result.success) {
-                return parserFail();
+            if (result.success) {
+                values.push(result.value);
             }
-
-            values.push(result.value);
-        };
+            else if (!skipFailed && !result.success) {
+                return parserRefail(result, "Unable to parse array member");
+            }
+        }
 
         return parserSuccess(values);
-    }
-}
+    };
+};

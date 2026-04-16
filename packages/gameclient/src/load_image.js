@@ -1,5 +1,5 @@
 import { CRC2DGraphics } from './graphics_crc2d.js'
-import { Spritesheet } from './Spritesheet.js'
+import { makeSpritesheet } from './Spritesheet.js'
 
 export async function load_image_url(url) {
     const image = new Image()
@@ -18,10 +18,12 @@ export async function load_image(name) {
 export async function load_spritesheet(name) {
     const image = await load_image_url(`/assets/spritesheets/${name}.png`);
 
-    const response = await fetch(`/assets/spritesheets/${name}.spriteatlas`);
+    const response = await fetch(`/assets/spritesheets/${name}.json`);
     const atlas = await response.json();
 
-    const spritesheet = new Spritesheet(image, atlas);
+    const spritesheet = makeSpritesheet(image, atlas);
+
+    console.log(spritesheet);
 
     return spritesheet;
 }

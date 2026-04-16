@@ -1,3 +1,4 @@
+import { getRenderScale, getViewport } from './CanvasRenderingContext2dGraphics.js'
 import { get_player } from './player.js'
 
 const chat_bubbles = new Map()
@@ -57,9 +58,12 @@ export function render_chat_bubbles(game) {
             chat_bubble.element.style.display = 'none'
         }
         else {
+            const render_scale = getRenderScale();
+            const viewport = getViewport();
+
             chat_bubble.element.style.display = 'block'
-            const position_x = (position.x - game.graphics.viewport.left) * game.graphics.render_scale;
-            const position_y = (position.y - game.graphics.viewport.top) * game.graphics.render_scale - 40;
+            const position_x = (position.x - viewport.left) * render_scale;
+            const position_y = (position.y - viewport.top) * render_scale - 40;
             chat_bubble.element.style.left = `${position_x}px`
             chat_bubble.element.style.top = `${position_y}px`
         }

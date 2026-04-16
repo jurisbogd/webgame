@@ -1,4 +1,5 @@
 import { get_room } from "../get/get_room.js";
+import { Vec2 } from "@jbwg/shared/math";
 
 let next_network_id = 0;
 
@@ -11,15 +12,16 @@ export function on_connection(game, connection) {
 
     const id = get_next_network_id();
 
-    const room = get_room(game, { i: 0, j: 0 });
-    const room_width = room.width * 16;
-    const room_height = room.height * 16;
+    // const room = get_room(game, { i: 0, j: 0 });
+    const room = game.rooms.get("bigMap");
+    const roomWidth = room.width * 16;
+    const roomHeight = room.height * 16;
 
     const player = {
         connection: connection,
-        room: room.id,
-        x: room_width / 2,
-        y: room_height / 2,
+        room: 0,
+        position: new Vec2(roomWidth / 2, roomHeight / 2),
+        velocity: Vec2.zero,
     };
 
     send_initialization_packet(game, connection, id, room);
@@ -44,12 +46,15 @@ export function send_initialization_packet(game, connection, network_id, room) {
     packet.events.push({ tag: 'SET_PLAYER_ID', id: network_id });
 
     for (const [network_id, player] of game.players) {
-        packet.events.push({ tag: 'NEW_ENTITY', id: network_id, x: player.x, y: player.y, room_id: player.room })
+        packet.events.push({ tag: 'NEW_ENTITY', id: network_id, position: player.position, velocity: player.velocity, room_id: player.room })
     };
 
     packet.events.push({ tag: 'SET_ROOM', room: room });
 
+    // console.log(packet);
+    // console.log(packet.events[1].room);
+
     const json = JSON.stringify(packet);
     connection.send(json);
-    console.log(json);
+    // console.log(json);
 }

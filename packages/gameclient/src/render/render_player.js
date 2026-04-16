@@ -1,4 +1,5 @@
-import { Draw } from '../Draw.js';
+import { render } from '../CanvasRenderingContext2dGraphics.js';
+import { Draw, drawSprite } from '../Draw.js';
 import { get_player } from '../player.js';
 
 export function render_players(game) {
@@ -17,25 +18,27 @@ function render_player(game, player) {
         return;
     }
 
-    if (player.room !== game.room.id) {
-        console.log('room id mismatch');
-        return;
-    }
+    // if (player.room !== game.room.id) {
+    //     console.log('room id mismatch');
+    //     return;
+    // }
 
     const position = player.position;
-    const previous_position = player.previous_position;
+    // const previous_position = player.previous_position;
 
-    if (position === undefined || previous_position === undefined) return;
+    const velocity = player.velocity;
 
-    if (position.y > previous_position.y) player.look_direction = 'down';
-    else if (position.y < previous_position.y) player.look_direction = 'up';
-    else if (position.x > previous_position.x) player.look_direction = 'right';
-    else if (position.x < previous_position.x) player.look_direction = 'left';
+    // if (position === undefined || previous_position === undefined) return;
 
-    const spritesheet = game.spritesheets.player_basic_demo;
+    if (velocity.y > 0) player.look_direction = 'down';
+    else if (velocity.y < 0) player.look_direction = 'up';
+    else if (velocity.x > 0) player.look_direction = 'right';
+    else if (velocity.x < 0) player.look_direction = 'left';
+
+    const spritesheet = game.spritesheets.player_base;
 
     let frame;
-    if (position.x !== previous_position.x || position.y !== previous_position.y) {
+    if (velocity.x !== 0 || velocity.y) {
         let animation;
 
         if (player.look_direction === 'right') animation = 'walk_right';
@@ -43,8 +46,14 @@ function render_player(game, player) {
         else if (player.look_direction === 'down') animation = 'walk_down';
         else if (player.look_direction === 'up') animation = 'walk_up';
 
-        frame = spritesheet.get_animation_frame(animation, player.animation_time);
-        player.animation_time = spritesheet.step_animation_time(animation, player.animation_time);
+        const sheetAnimation = spritesheet.animations[animation];
+
+        player.animation_time = (player.animation_time + 1 / 60) % sheetAnimation.duration;
+        const frameIdx = Math.floor(player.animation_time / sheetAnimation.duration * sheetAnimation.frames.length);
+        frame = sheetAnimation.frames[frameIdx];
+
+        // frame = spritesheet.get_animation_frame(animation, player.animation_time);
+        // player.animation_time = spritesheet.step_animation_time(animation, player.animation_time);
     }
     else {
         if (player.look_direction === 'right') frame = 'look_right';
@@ -54,8 +63,13 @@ function render_player(game, player) {
         player.animation_time = 0;
     }
 
-    const draw = Draw.sprite(spritesheet, frame, position.x, position.y)
-        .set_depth_bottom();
+    const draw = drawSprite(spritesheet, frame, position);
+    draw.depth = draw.bottom;
 
-    game.graphics.render_buffered(draw);
+    // const draw = Draw.sprite(spritesheet, frame, position.x, position.y)
+    // .set_depth_bottom();
+
+    render(draw, true);
+
+    // game.graphics.render_buffered(draw);
 }

@@ -19,12 +19,18 @@ async function connect(url) {
         const packet = JSON.parse(json);
         const result = eventPacketParser(packet);
 
+        // console.log(packet);
+
         if (result.success) {
+            for (const event of result.value.events) {
+                console.log(event.tag);
+            };
+
             received.push(result.value);
         }
         else {
             console.log('Unknown packet');
-            console.log(event);
+            console.log(result.reason);
         };
     }
     return new Promise((resolve, reject) => {

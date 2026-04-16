@@ -24,7 +24,7 @@ import { create_game } from './create/create_game.js'
 //     rooms: new Map(),
 // }
 
-const game = create_game();
+const game = await create_game();
 
 // server.on('connection', (connection) => {
 //     console.log('new connection')
@@ -79,8 +79,8 @@ function consume_new_players(game) {
             tag: 'NEW_ENTITY',
             id: player_id,
             room_id: player.room,
-            x: player.x,
-            y: player.y,
+            position: player.position,
+            velocity: player.velocity,
         };
 
         game.packet_to_send.events.push(event);
@@ -90,9 +90,15 @@ function consume_new_players(game) {
 }
 
 function transmit_player_positions(game) {
-    for (const [player_id, player] of game.players) {
-        const set_position_event = { tag: 'SET_POSITION', id: player_id, x: player.x, y: player.y };
-        game.packet_to_send.events.push(set_position_event);
+    for (const [playerId, player] of game.players) {
+        // const set_position_event = { tag: 'SET_POSITION', id: player_id, x: player.x, y: player.y };
+        const setPositionEvent = {
+            tag: "SET_POSITION",
+            id: playerId,
+            position: player.position,
+            velocity: player.velocity,
+        };
+        game.packet_to_send.events.push(setPositionEvent);
     }
 }
 

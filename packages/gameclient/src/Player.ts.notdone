@@ -1,0 +1,133 @@
+import { Rect, Vec2 } from "@jbwg/shared/math";
+import { drawSprite } from "./Draw";
+import { Animation } from "./Spritesheet";
+import { Spritesheet } from "./Spritesheet";
+import { renderBuffered } from "./CanvasRenderingContext2dGraphics";
+
+interface Player {
+    spritesheet: Spritesheet;
+    animationTime: number;
+    lookDirection: number;
+
+    position: Vec2;
+    velocity: Vec2;
+};
+
+function stepAnimationTime(
+    animation: Animation,
+    animationTime: number,
+    dt: number,
+) {
+    if (animation.duration <= 0) {
+        return 0;
+    };
+
+    return (animationTime + dt) % animation.duration;
+};
+
+function getAnimationFrame(
+    animation: Animation,
+    animationTime: number,
+) {
+    const frame = Math.floor(animationTime * animation.frames.length);
+    return animation.frames[frame];
+};
+
+function getNewLookDirection(player: Player) {
+    const angle = Math.atan2(player.velocity.y, player.velocity.x);
+    const unradians = angle / (Math.PI * 2);
+    const sections = (unradians * 4) + 0.5;
+    const snapped = Math.floor(sections % 4);
+    const degrees = snapped * (360 / 4);
+
+    return degrees;
+};
+
+export function renderPlayers(
+    players: Player[],
+    dt: number,
+) {
+    for (const player of players) {
+        const isWalking =
+            player.velocity.x !== 0 &&
+            player.velocity.y !== 0;
+
+        const animation = isWalking
+            ? "walking"
+            : "still"
+
+        if (isWalking) {
+            player.lookDirection = getNewLookDirection(player);
+        };
+
+        const realAnimation = player.spritesheet.animations[
+            player.spritesheet.directionals[animation][player.lookDirection]
+        ];
+
+        player.animationTime = stepAnimationTime(
+            realAnimation,
+            player.animationTime,
+            dt,
+        );
+
+        const frame = getAnimationFrame(realAnimation, player.animationTime);
+
+        const draw = drawSprite(
+            player.spritesheet,
+            player.position,
+            frame,
+        );
+
+        draw.depth = draw.bottom;
+
+        renderBuffered(draw);
+    };
+};
+
+import { getInputMap } from "./KeyboardInput";
+
+export function update_player(game: any) {
+    const player = get_player(game)
+
+    if (!player) return
+
+    const position = player.position
+
+    if (!position) return
+
+    const speed = 2
+    let velocityX = 0
+    let velocityY = 0
+
+    const inputMap = getInputMap();
+    const movementDirection = getMovementDirection(inputMap);
+
+    if (is_key_down('KeyW')) velocityY -= speed
+    if (is_key_down('KeyA')) velocityX -= speed
+    if (is_key_down('KeyS')) velocityY += speed
+    if (is_key_down('KeyD')) velocityX += speed
+
+    const previous_position = new Vec2(position.x, position.y);
+    player.previous_position = previous_position;
+
+    if (velocityX !== 0 || velocityY !== 0) {
+        position.x += velocityX
+        position.y += velocityY
+    }
+
+    const event = { tag: 'SET_POSITION', x: position.x, y: position.y, };
+
+    queue_event(event);
+}
+
+export function get_player(game) {
+    return game.entities.get(game.player_id)
+}
+
+export function get_player_id(game) {
+    return game.player_id
+}
+
+export function set_player_id(game, player_id) {
+    game.player_id = player_id
+}

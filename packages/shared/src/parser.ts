@@ -10,13 +10,16 @@ import { arrayParser } from "./parser/arrayParser"
 import { array2dParser } from "./parser/array2dParser"
 import { defaultParser } from "./parser/defaultParser"
 import { parserSuccess } from "./parser/parserSuccess"
-import { parserFail } from "./parser/parserFail"
+import { parserFail, parserRefail } from "./parser/parserFail"
 import { mapParser } from "./parser/mapParser"
 import { rectParser } from "./parser/rectParser"
+import { recordParser } from "./parser/recordParser"
+import { booleanParser } from "./parser/booleanParser"
 
 export const parser = {
     number: numberParser,
     string: stringParser,
+    boolean: booleanParser,
 
     stringLiteral: stringLiteralParser,
     vec2: vec2Parser,
@@ -29,7 +32,9 @@ export const parser = {
     array: arrayParser,
     array2d: array2dParser,
     map: mapParser,
+    record: recordParser,
 
     success: parserSuccess,
     fail: parserFail,
+    refail: parserRefail,
 }

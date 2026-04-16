@@ -1,8 +1,9 @@
 import { create_room } from "./create_room.js";
 import { create_server } from "./create_server.js";
 import { on_connection } from "./on_connection.js";
+import { loadRoom } from "./loadRoom.js";
 
-export function create_game() {
+export async function create_game() {
     const server = create_server();
 
     const game = {
@@ -14,6 +15,8 @@ export function create_game() {
         packets_from_clients: [],
         rooms: new Map(),
     };
+
+    await loadRoom("bigMap", game);
 
     server.on('connection', (connection) => {
         on_connection(game, connection);

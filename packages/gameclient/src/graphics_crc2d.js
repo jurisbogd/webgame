@@ -7,6 +7,25 @@ export async function init_graphics_crc2d(canvas) {
     })
 }
 
+// const canvas = document.getElementById("canvas-2d");
+
+// const graphics = await init_graphics_crc2d(canvas);
+
+// export function render(draw, buffer = false) {
+//     if (buffer) {
+//         graphics.render_buffered(draw);
+//     }
+//     else {
+//         graphics.render(draw);
+//     }
+// }
+
+// export function clear(color = "cornflowerblue") {
+//     graphics.clear(color);
+// }
+
+// export function 
+
 export class CRC2DGraphics {
     canvas
     ctx
@@ -81,34 +100,52 @@ export class CRC2DGraphics {
     }
 
     #render(draw) {
-        const position_x = draw.get_left() - this.viewport.left;
-        const position_y = draw.get_top() - this.viewport.top;
-        const position_x_scaled = Math.floor(position_x) * this.render_scale;
-        const position_y_scaled = Math.floor(position_y) * this.render_scale;
-        const width_scaled = draw.transform.w * this.render_scale;
-        const height_scaled = draw.transform.h * this.render_scale;
+        // const position_x = draw.get_left() - this.viewport.left;
+        // const position_y = draw.get_top() - this.viewport.top;
+        // const position_x_scaled = Math.floor(position_x) * this.render_scale;
+        // const position_y_scaled = Math.floor(position_y) * this.render_scale;
+        // const width_scaled = draw.transform.w * this.render_scale;
+        // const height_scaled = draw.transform.h * this.render_scale;
 
-        this.ctx.drawImage(
-            draw.sprite,
-            draw.sprite_rect.x,
-            draw.sprite_rect.y,
-            draw.sprite_rect.w,
-            draw.sprite_rect.h,
-            position_x_scaled,
-            position_y_scaled,
-            width_scaled,
-            height_scaled
-        )
+        // this.ctx.drawImage(
+        //     draw.sprite,
+        //     draw.sprite_rect.x,
+        //     draw.sprite_rect.y,
+        //     draw.sprite_rect.w,
+        //     draw.sprite_rect.h,
+        //     position_x_scaled,
+        //     position_y_scaled,
+        //     width_scaled,
+        //     height_scaled
+        // )
+        const xPosition = draw.left - viewport.left;
+        const yPosition = draw.top - viewport.top;
+        const scaledXPosition = Math.floor(xPosition) * renderScale;
+        const scaledYPosition = Math.floor(yPosition) * renderScale;
+        const scaledWidth = draw.transform.w * renderScale;
+        const scaledHeight = draw.transform.h * renderScale;
+
+        canvasRenderingContext2d.drawImage(
+            draw.image,
+            draw.spriteRect.x,
+            draw.spriteRect.y,
+            draw.spriteRect.w,
+            draw.spriteRect.h,
+            scaledXPosition,
+            scaledYPosition,
+            scaledWidth,
+            scaledHeight
+        );
     }
 
     #in_viewport(draw) {
         // return this.viewport.contains(draw.transform);
         const viewport = this.viewport;
         return !(
-            viewport.bottom < draw.get_top() ||
-            viewport.top > draw.get_bottom() ||
-            viewport.right < draw.get_left() ||
-            viewport.left > draw.get_right()
+            viewport.bottom < draw.top ||
+            viewport.top > draw.bottom ||
+            viewport.right < draw.left ||
+            viewport.left > draw.right
         );
     }
 

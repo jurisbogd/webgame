@@ -1,6 +1,6 @@
-import { ParserResult } from "./ParserResult";
+import { ParserSuccess } from "./ParserResult";
 
-export function parserSuccess<T>(value: T): ParserResult<T> {
+export function parserSuccess<T>(value: T): ParserSuccess<T> {
     return {
         success: true,
         value,

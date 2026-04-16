@@ -1,122 +1,159 @@
-import { Rect, Vec2 } from "@jbwg/shared/math";
-import { Spritesheet } from "./Spritesheet.js";
+import { IRect, Rect, Vec2 } from "@jbwg/shared/math";
+import { Spritesheet } from "./Spritesheet";
 
-export class Draw {
-    sprite;
-    transform;
-    sprite_rect;
+export function drawTile(
+    image: HTMLImageElement,
+    tileId: number,
+    position: Vec2,
+) {
+    // const cs = Math.floor(image.width / 16);
+    // const rs = Math.floor(image.height / 16);
+
+    const columns = image.width / 16;
+    const rows = image.height / 16;
+
+    const column = tileId % columns;
+    const row = Math.floor(tileId / columns);
+
+    // const c = tileId % cs;
+    // const r = Math.floor(tileId / rs);
+
+    if (row > rows || column < 0 || row < 0) {
+        throw new Error(`Tile #${tileId} out of range in tileset ${image.src}`);
+        //     console.warn(`Tile #${tileId} out of range, rows: ${rs}, columns ${cs}, got row: ${r}, column ${c}`);
+        //     return;
+    };
+
+    const tileSize = 16;
+    const spriteRect = new Rect(column * tileSize, row * tileSize, tileSize, tileSize);
+    const transform = new Rect(position.x, position.y, tileSize, tileSize);
+    const pivot = Vec2.zero;
+
+    return new Draw(image, transform, spriteRect, pivot);
+}
+
+export function drawSprite(
+    spritesheet: Spritesheet,
+    spriteName: string,
+    position: Vec2,
+) {
+    if (spriteName === undefined) {
+        console.log(`Sprite name is undefined`);
+    };
+
+    // console.log(spriteName);
+    const sprite = spritesheet.sprites[spriteName];
+
+    if (sprite === undefined) {
+        console.log(`Sprite ${spriteName} is undefined`);
+    };
+
+    const image = spritesheet.image;
+    const spriteRect = Rect.copy(sprite.rect);
+    const transform = new Rect(
+        position.x,
+        position.y,
+        spriteRect.w,
+        spriteRect.h,
+    );
+    const pivot = Vec2.copy(sprite.pivot);
+
+    return new Draw(image, transform, spriteRect, pivot);
+};
+
+export class Draw implements IRect {
     pivot;
+    image;
+    transform;
+    spriteRect;
     depth = 0;
 
-    constructor(sprite: any, transform: Rect, sprite_rect: Rect, pivot: Vec2) {
-        this.sprite = sprite;
+    constructor(image: any, transform: Rect, sprite_rect: Rect, pivot: Vec2) {
+        this.image = image;
         this.transform = transform;
-        this.sprite_rect = sprite_rect;
+        this.spriteRect = sprite_rect;
         this.pivot = pivot;
-    }
+    };
 
-    static image(image: any, x: number, y: number): Draw {
+    static image(image: HTMLImageElement, x: number, y: number): Draw {
         const transform = new Rect(x, y, image.width, image.height);
-        const sprite_rect = new Rect(0, 0, image.width, image.height);
+        const spriteRect = new Rect(0, 0, image.width, image.height);
         const pivot = Vec2.zero;
 
-        const draw = new Draw(image, transform, sprite_rect, pivot);
+        const draw = new Draw(image, transform, spriteRect, pivot);
 
         return draw;
-    }
+    };
 
-    static sprite(spritesheet: Spritesheet, id: string, x: number, y: number) {
-        const sprite_rect = Rect.copy(spritesheet.get_sprite_rect(id));
-        const transform = new Rect(x, y, sprite_rect.w, sprite_rect.h);
-        const sprite_pivot = spritesheet.get_sprite_pivot(id);
-        const pivot = new Vec2(sprite_pivot.x, sprite_pivot.y);
+    // static tile(tileset: ITileset, id: number, position: Vec2) {
+    //     const image = tileset.image;
+    //     const spriteRect = tileset.getSpriteRect(id);
 
-        const draw = new Draw(spritesheet.image, transform, sprite_rect, pivot);
+    //     if (!isNotNullOrUndefined(spriteRect)) {
+    //         return undefined;
+    //     };
 
-        return draw;
-    }
+    //     const transform = new Rect(position.x, position.y, spriteRect.w, spriteRect.h);
+    //     const pivot = Vec2.zero;
 
-    set_position(x: number, y: number) {
-        this.transform.x = x;
-        this.transform.y = y;
-        // this.transform.set_position(x, y);
+    //     const draw = new Draw(image, transform, spriteRect, pivot);
 
-        return this;
-    }
+    //     return draw;
+    // };
 
-    set_scale(x: number, y: number) {
-        this.transform.w = this.sprite_rect.w * x;
-        this.transform.h = this.sprite_rect.h * y;
+    get position() {
+        return this.transform.position;
+    };
 
-        return this;
-    }
+    set position(value: Vec2) {
+        this.transform.position = value;
+    };
 
-    set_scale_absolute(x: number, y: number) {
-        this.transform.w = x;
-        this.transform.h = y;
+    get scale() {
+        const w = this.transform.w / this.spriteRect.w;
+        const h = this.transform.h / this.spriteRect.h;
 
-        return this;
-    }
+        return new Vec2(w, h);
+    };
 
-    set_pivot(x: number, y: number) {
-        this.pivot.x = x * this.transform.w;
-        this.pivot.y = y * this.transform.h;
+    set scale(value: Vec2) {
+        this.transform.w = this.spriteRect.w * value.x;
+        this.transform.h = this.spriteRect.h * value.y;
+    };
 
-        return this;
-    }
+    get absoluteScale() {
+        return this.transform.size;
+    };
 
-    set_pivot_absolute(x: number, y: number) {
-        this.pivot.x = x;
-        this.pivot.y = y;
+    set absoluteScale(value: Vec2) {
+        this.transform.size = value;
+    };
 
-        return this;
-    }
+    get relativePivot() {
+        const x = this.pivot.x / this.transform.w;
+        const y = this.pivot.y / this.transform.h;
 
-    set_depth(depth: number) {
-        this.depth = depth;
+        return new Vec2(x, y);
+    };
 
-        return this;
-    }
+    set relativePivot(value: Vec2) {
+        this.pivot.x = value.x * this.transform.w;
+        this.pivot.y = value.y * this.transform.h;
+    };
 
-    get_top(): number {
-        const y = this.transform.y;
-        const top = y - this.pivot.y;
+    get top() {
+        return this.transform.y - this.pivot.y;
+    };
 
-        return top;
-    }
+    get bottom() {
+        return this.transform.y + this.transform.h - this.pivot.y;
+    };
 
-    get_bottom(): number {
-        const y = this.transform.y;
-        const height = this.transform.h;
-        const pivot_y = this.pivot.y;
-        const bottom = y + height - pivot_y;
+    get left() {
+        return this.transform.x - this.pivot.x;
+    };
 
-        return bottom;
-    }
-
-    get_left(): number {
-        const x = this.transform.x;
-        const pivot_x = this.pivot.x;
-        const left = x - pivot_x;
-
-        return left;
-    }
-
-    get_right(): number {
-        const x = this.transform.x;
-        const width = this.transform.w;
-        const pivot_x = this.pivot.x;
-        const right = x + width - pivot_x;
-
-        return right;
-    }
-
-    // set depth to bottom of rendered sprite
-    set_depth_bottom(depth_mod: number = 0) {
-        const bottom = this.get_bottom();
-        const depth = bottom + depth_mod;
-        this.depth = depth;
-
-        return this;
-    }
-}
+    get right() {
+        return this.transform.x + this.transform.w - this.pivot.x;
+    };
+};

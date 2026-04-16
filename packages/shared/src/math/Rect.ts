@@ -19,6 +19,10 @@ export class Rect extends Float32Array implements IRect {
         return new Rect(rect.x, rect.y, rect.w, rect.h);
     }
 
+    static get zero() {
+        return new Rect(0, 0, 0, 0);
+    };
+
     contains(rectangle: Rect) {
         return !(
             this.bottom < rectangle.top ||

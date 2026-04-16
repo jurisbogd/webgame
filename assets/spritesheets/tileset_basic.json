@@ -1,0 +1,108 @@
+{
+    "sprites": {
+        "paved": {
+            "rect": {
+                "x": 16,
+                "y": 0,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "grass": {
+            "rect": {
+                "x": 32,
+                "y": 0,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "brick_middle_left": {
+            "rect": {
+                "x": 0,
+                "y": 16,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "brick_center": {
+            "rect": {
+                "x": 16,
+                "y": 16,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "brick_middle_right": {
+            "rect": {
+                "x": 32,
+                "y": 16,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "brick_bottom_left": {
+            "rect": {
+                "x": 0,
+                "y": 32,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "brick_bottom_middle": {
+            "rect": {
+                "x": 16,
+                "y": 32,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "brick_bottom_right": {
+            "rect": {
+                "x": 32,
+                "y": 32,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "wall_center": {
+            "rect": {
+                "x": 16,
+                "y": 64,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "wall_left": {
+            "rect": {
+                "x": 0,
+                "y": 64,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "wall_right": {
+            "rect": {
+                "x": 32,
+                "y": 64,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "wall_top": {
+            "rect": {
+                "x": 16,
+                "y": 48,
+                "w": 16,
+                "h": 16
+            }
+        },
+        "wall_bottom": {
+            "rect": {
+                "x": 16,
+                "y": 80,
+                "w": 16,
+                "h": 16
+            }
+        }
+    }
+}

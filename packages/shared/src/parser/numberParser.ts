@@ -7,6 +7,6 @@ export function numberParser(x: any): ParserResult<number> {
         return parserSuccess(x);
     }
     else {
-        return parserFail();
+        return parserFail("Unable to parse number");
     };
 };

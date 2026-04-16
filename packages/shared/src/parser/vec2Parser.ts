@@ -7,5 +7,5 @@ export const vec2Parser = composeParser(
         x: numberParser,
         y: numberParser,
     },
-    ({ x, y }) => new Vec2(x, y)
+    ({ x, y }) => new Vec2(x, y),
 )

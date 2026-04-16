@@ -1,0 +1,224 @@
+{
+    "sprites": {
+        "look_down": {
+            "rect": {
+                "x": 0,
+                "y": 0,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "look_left": {
+            "rect": {
+                "x": 24,
+                "y": 0,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "look_up": {
+            "rect": {
+                "x": 48,
+                "y": 0,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "look_right": {
+            "rect": {
+                "x": 72,
+                "y": 0,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_down_0": {
+            "rect": {
+                "x": 0,
+                "y": 48,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_down_1": {
+            "rect": {
+                "x": 0,
+                "y": 96,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_left_0": {
+            "rect": {
+                "x": 24,
+                "y": 48,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_left_1": {
+            "rect": {
+                "x": 24,
+                "y": 96,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_up_0": {
+            "rect": {
+                "x": 48,
+                "y": 48,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_up_1": {
+            "rect": {
+                "x": 48,
+                "y": 96,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_right_0": {
+            "rect": {
+                "x": 72,
+                "y": 48,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        },
+        "walk_right_1": {
+            "rect": {
+                "x": 72,
+                "y": 96,
+                "w": 24,
+                "h": 48
+            },
+            "pivot": {
+                "x": 12,
+                "y": 52
+            }
+        }
+    },
+    "animations": {
+        "still_up": {
+            "frames": [
+                "look_up"
+            ],
+            "duration": 0.0
+        },
+        "still_down": {
+            "frames": [
+                "look_down"
+            ],
+            "duration": 0.0
+        },
+        "still_left": {
+            "frames": [
+                "look_left"
+            ],
+            "duration": 0.0
+        },
+        "still_right": {
+            "frames": [
+                "look_right"
+            ],
+            "duration": 0.0
+        },
+        "walk_down": {
+            "frames": [
+                "look_down",
+                "walk_down_0",
+                "look_down",
+                "walk_down_1"
+            ],
+            "duration": 1.0
+        },
+        "walk_left": {
+            "frames": [
+                "look_left",
+                "walk_left_0",
+                "look_left",
+                "walk_left_1"
+            ],
+            "duration": 1.0
+        },
+        "walk_up": {
+            "frames": [
+                "look_up",
+                "walk_up_0",
+                "look_up",
+                "walk_up_1"
+            ],
+            "duration": 1.0
+        },
+        "walk_right": {
+            "frames": [
+                "look_right",
+                "walk_right_0",
+                "look_right",
+                "walk_right_1"
+            ],
+            "duration": 1.0
+        }
+    },
+    "directionals": {
+        "walking": {
+            "0": "walk_right",
+            "90": "walk_up",
+            "180": "walk_left",
+            "270": "walk_down"
+        },
+        "still": {
+            "0": "still_right",
+            "90": "still_up",
+            "180": "still_left",
+            "270": "still_down"
+        }
+    }
+}

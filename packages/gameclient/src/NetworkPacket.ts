@@ -1,51 +1,57 @@
 import { Vec2 } from "@jbwg/shared/math";
 import { Parser, parser } from "@jbwg/shared/parser"
+import { Room, roomParser } from "./Room";
 
-type SetPositionEvent = {
-    id: number,
-    x: number,
-    y: number,
+export interface SetPositionEvent extends NetworkEventBase {
+    tag: "SET_POSITION";
+    id: number;
+    position: Vec2;
+    velocity: Vec2;
 };
 
 const setPositionParser: Parser<SetPositionEvent> = parser.compose({
     id: parser.number,
-    x: parser.number,
-    y: parser.number,
+    position: parser.vec2,
+    velocity: parser.vec2,
 });
 
-type SetPlayerIdEvent = {
-    id: number,
+export interface SetPlayerIdEvent extends NetworkEventBase {
+    tag: "SET_PLAYER_ID";
+    id: number;
 };
 
 const setPlayerIdParser: Parser<SetPlayerIdEvent> = parser.compose({
     id: parser.number,
 });
 
-type NewEntityEvent = {
-    id: number,
-    room_id: number,
-    x: number,
-    y: number,
+export interface NewEntityEvent extends NetworkEventBase {
+    tag: "NEW_ENTITY";
+    id: number;
+    room_id: number;
+    position: Vec2;
+    velocity: Vec2;
 };
 
 const newEntityParser: Parser<NewEntityEvent> = parser.compose({
     id: parser.number,
     room_id: parser.number,
-    x: parser.number,
-    y: parser.number,
+    position: parser.vec2,
+    velocity: parser.vec2,
 });
 
-type DeletePlayerEvent = {
-    id: number,
+export interface DeletePlayerEvent extends NetworkEventBase {
+    tag: "DELETE_PLAYER";
+    id: number;
 };
 
 const deletePlayerParser: Parser<DeletePlayerEvent> = parser.compose({
     id: parser.number,
 });
 
-type ChatMessageEvent = {
-    id: number,
-    message: string,
+export interface ChatMessageEvent extends NetworkEventBase {
+    tag: "CHAT_MESSAGE";
+    id: number;
+    message: string;
 };
 
 const chatMessageParser: Parser<ChatMessageEvent> = parser.compose({
@@ -79,48 +85,67 @@ type DSRERoom = {
     }[];
 };
 
-type SetRoomEvent = {
-    room: DSRERoom;
+export interface SetRoomEvent extends NetworkEventBase {
+    tag: "SET_ROOM";
+    room: Room;
 };
 
 const setRoomParser: Parser<SetRoomEvent> = parser.compose({
-    room: parser.compose({
-        id: parser.number,
-        width: parser.number,
-        height: parser.number,
-        floor: parser.array2d(
-            parser.compose({
-                tileset: parser.string,
-                id: parser.string,
-            }),
-        ),
-        features: parser.array2d(
-            parser.default(
-                parser.compose({
-                    tileset: parser.string,
-                    id: parser.string,
-                    depth_mod: parser.number,
-                }),
-                () => { return { tileset: "", id: "", depth_mod: 0 } },
-            ),
-        ),
-        objects: parser.array(
-            parser.compose({
-                type: parser.stringLiteral("door"),
-                tileset: parser.string,
-                id: parser.string,
-                x: parser.number,
-                y: parser.number,
-                dest_ord: parser.compose({
-                    i: parser.number,
-                    j: parser.number,
-                }),
-            }),
-        ),
-    }),
+    room: roomParser,
 });
 
-type SetPlayerRoomEvent = {
+// const setRoomParser: Parser<SetRoomEvent> = parser.compose({
+//     room: parser.compose({
+//         id: parser.number,
+//         width: parser.number,
+//         height: parser.number,
+//         floor: parser.array2d(
+//             parser.compose({
+//                 tileset: parser.string,
+//                 id: parser.string,
+//             }),
+//         ),
+//         features: parser.array2d(
+//             parser.default(
+//                 parser.compose({
+//                     tileset: parser.string,
+//                     id: parser.string,
+//                     depth_mod: parser.number,
+//                 }),
+//                 () => { return { tileset: "", id: "", depth_mod: 0 } },
+//             ),
+//         ),
+//         objects: parser.array(
+//             parser.compose({
+//                 type: parser.stringLiteral("door"),
+//                 tileset: parser.string,
+//                 id: parser.string,
+//                 x: parser.number,
+//                 y: parser.number,
+//                 dest_ord: parser.compose({
+//                     i: parser.number,
+//                     j: parser.number,
+//                 }),
+//             }),
+//         ),
+//     }),
+// });
+
+type NetworkEventTag =
+    | "SET_PLAYER_ROOM"
+    | "SET_POSITION"
+    | "SET_PLAYER_ID"
+    | "NEW_ENTITY"
+    | "DELETE_PLAYER"
+    | "CHAT_MESSAGE"
+    | "SET_ROOM"
+
+interface NetworkEventBase {
+    tag: NetworkEventTag;
+};
+
+export interface SetPlayerRoomEvent extends NetworkEventBase {
+    tag: "SET_PLAYER_ROOM";
     room_id: number;
     player_id: number;
 };
@@ -150,7 +175,7 @@ const snapshotParser: Parser<SnapshotPacket> = parser.compose({
     ),
 });
 
-type NetworkEvent =
+export type NetworkEvent =
     | SetPlayerIdEvent
     | SetPositionEvent
     | NewEntityEvent

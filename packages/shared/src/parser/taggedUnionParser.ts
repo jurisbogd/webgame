@@ -1,6 +1,6 @@
 import { isNotNullOrUndefined } from "../utils";
 import { Parser } from "./Parser";
-import { parserFail } from "./parserFail";
+import { parserFail, parserRefail } from "./parserFail";
 import { stringParser } from "./stringParser";
 import { parserSuccess } from "./parserSuccess";
 
@@ -20,25 +20,25 @@ export function taggedUnionParser<
 ): Parser<TaggedUnionParserResult<TagField, Parsers>> {
     return (x: any) => {
         if (!isNotNullOrUndefined(x)) {
-            return { success: false }
+            return parserFail("Expected tagged union, got undefined");
         }
 
         const tag = stringParser(x[tagField]);
 
         if (!tag.success) {
-            return parserFail();
+            return parserRefail(tag, `Unable to find tag field ${tagField}`);
         };
 
         const parser = parsers[tag.value];
 
         if (!parser) {
-            return parserFail();
+            return parserFail(`Unexpected tagged union tag: ${tag.value}`);
         };
 
         const result = parser(x);
 
         if (!result.success) {
-            return parserFail();
+            return parserRefail(result, `Unable to parse tagged union member with tag ${tag.value}`);
         };
 
         return parserSuccess({
