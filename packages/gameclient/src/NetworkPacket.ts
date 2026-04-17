@@ -184,7 +184,7 @@ export type NetworkEvent =
     | SetRoomEvent
     | SetPlayerRoomEvent
 
-type EventPacket = {
+export type EventPacket = {
     events: NetworkEvent[];
 }
 

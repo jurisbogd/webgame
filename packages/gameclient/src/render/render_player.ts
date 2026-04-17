@@ -1,8 +1,10 @@
-import { render } from '../CanvasRenderingContext2dGraphics.js';
-import { Draw, drawSprite } from '../Draw.js';
-import { get_player } from '../player.js';
+import { Vec2 } from '@jbwg/shared/math';
+import { render } from '../CanvasRenderingContext2dGraphics';
+import { Draw, drawSprite } from '../Draw';
+import { Game, Player } from '../index';
+import { get_player } from '../Player';
 
-export function render_players(game) {
+export function render_players(game: Game) {
     for (const entity of game.entities.values()) {
         render_player(game, entity);
 
@@ -10,7 +12,7 @@ export function render_players(game) {
     }
 }
 
-function render_player(game, player) {
+function render_player(game: Game, player: Player) {
     // const player = get_player(game);
 
     if (!player) {
@@ -44,7 +46,7 @@ function render_player(game, player) {
         if (player.look_direction === 'right') animation = 'walk_right';
         else if (player.look_direction === 'left') animation = 'walk_left';
         else if (player.look_direction === 'down') animation = 'walk_down';
-        else if (player.look_direction === 'up') animation = 'walk_up';
+        else animation = 'walk_up';
 
         const sheetAnimation = spritesheet.animations[animation];
 
@@ -59,7 +61,7 @@ function render_player(game, player) {
         if (player.look_direction === 'right') frame = 'look_right';
         else if (player.look_direction === 'left') frame = 'look_left';
         else if (player.look_direction === 'down') frame = 'look_down';
-        else if (player.look_direction === 'up') frame = 'look_up';
+        else frame = 'look_up';
         player.animation_time = 0;
     }
 

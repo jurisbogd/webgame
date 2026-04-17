@@ -1,9 +1,10 @@
-import { getRenderScale, getViewport } from './CanvasRenderingContext2dGraphics.js'
-import { get_player } from './player.js'
+import { getRenderScale, getViewport } from './CanvasRenderingContext2dGraphics'
+import { Game } from './index'
+import { get_player } from './Player'
 
 const chat_bubbles = new Map()
 
-function create_chat_bubble(ui, entity_id, timestamp) {
+function create_chat_bubble(ui: HTMLDivElement, entity_id: number, timestamp: number) {
     const chat_bubble_element = document.createElement('div')
     chat_bubble_element.id = `chat-bubble${entity_id}`
     chat_bubble_element.className = 'chat-bubble'
@@ -17,7 +18,7 @@ function create_chat_bubble(ui, entity_id, timestamp) {
     return chat_bubble
 }
 
-export function render_chat_bubbles(game) {
+export function render_chat_bubbles(game: Game) {
     const player = get_player(game)
 
     if (!player) return
@@ -37,7 +38,7 @@ export function render_chat_bubbles(game) {
 
         const chat_bubble = chat_bubbles.has(entity_id)
             ? chat_bubbles.get(entity_id)
-            : create_chat_bubble(game.ui, entity_id)
+            : create_chat_bubble(game.ui, entity_id, chat_message.timestamp)
 
         const dx = player_position.x - position.x;
         const dy = player_position.y - position.y;
@@ -53,8 +54,8 @@ export function render_chat_bubbles(game) {
             chat_bubble.element.innerText = chat_message.message
         }
 
-        // render chat bubble
-        if (entity.room !== game.room.id || distance > distance_threshold || dt > chat_message_display_time) {
+        // if (entity.room !== game.room.id || distance > distance_threshold || dt > chat_message_display_time) {
+        if (distance > distance_threshold || dt > chat_message_display_time) {
             chat_bubble.element.style.display = 'none'
         }
         else {

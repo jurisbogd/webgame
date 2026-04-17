@@ -57,7 +57,7 @@ function new_entity_handler(game: Game, event: NewEntityEvent) {
         room: event.room_id,
         look_direction: "right",
         animation_time: 0,
-    }
+    };
 
     game.entities.set(event.id, entity)
 }
@@ -129,5 +129,8 @@ function set_player_room_handler(game: Game, event: SetPlayerRoomEvent) {
     const player_id = event.player_id;
     const room_id = event.room_id;
     const player = game.entities.get(event.player_id);
-    player.room = room_id;
+
+    if (player) {
+        player.room = room_id;
+    };
 }

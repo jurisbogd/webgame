@@ -1,21 +1,20 @@
-import { CRC2DGraphics } from './graphics_crc2d.js'
-import { makeSpritesheet } from './Spritesheet.js'
+import { makeSpritesheet } from './Spritesheet'
 
-export async function load_image_url(url) {
-    const image = new Image()
-    image.src = url
-    return new Promise((resolve, reject) => {
-        image.onload = () => resolve(image)
-        image.onerror = (err) => reject(err)
-    })
+export async function load_image_url(url: string) {
+    const image = new Image();
+
+    image.src = url;
+    await image.decode();
+
+    return image;
 }
 
-export async function load_image(name) {
-    const image = await load_image_url(`/assets/images/${name}.png`)
-    return image
+export async function load_image(name: string) {
+    const image = await load_image_url(`/assets/images/${name}.png`);
+    return image;
 }
 
-export async function load_spritesheet(name) {
+export async function load_spritesheet(name: string) {
     const image = await load_image_url(`/assets/spritesheets/${name}.png`);
 
     const response = await fetch(`/assets/spritesheets/${name}.json`);

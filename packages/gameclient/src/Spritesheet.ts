@@ -1,8 +1,8 @@
 import { Rect, Vec2 } from "@jbwg/shared/math";
 import { Parser, parser } from "@jbwg/shared/parser";
 
-export interface Spritesheet extends SpritesheetData {
-    image: HTMLImageElement;
+export interface Spritesheet<ImageType> extends SpritesheetData {
+    image: ImageType;
 };
 
 export interface SpritesheetData {
@@ -50,14 +50,14 @@ const spritesheetParser = parser.compose({
     ),
 }) as Parser<SpritesheetData>;
 
-export function makeSpritesheet(image: HTMLImageElement, json: any) {
+export function makeSpritesheet<ImageType>(image: ImageType, json: any) {
     const result = spritesheetParser(json);
 
     if (result.success) {
         return {
             image,
             ...result.value,
-        } as Spritesheet;
+        } as Spritesheet<ImageType>;
     }
     else {
         return undefined;

@@ -1,12 +1,8 @@
 import { Rect, Vec2 } from '@jbwg/shared/math'
-import { KeyboardInput } from './KeyboardInput.js'
-import { axisSeparatedCollisionTrace } from './axisSeparatedCollision.js';
-import { Room } from './Room.js';
-
-interface Player {
-    position: Vec2;
-    velocity: Vec2;
-};
+import { KeyboardInput } from './KeyboardInput'
+import { axisSeparatedCollisionTrace } from './axisSeparatedCollision';
+import { Room } from './Room';
+import { Game, Player } from './index';
 
 function playerInputProcess(player: Player) {
     const speed = 1.5;
@@ -21,12 +17,6 @@ function resolveCollisions(player: Player, room: Room) {
         player.velocity,
         room,
     );
-};
-
-interface Game {
-    entities: Map<number, Player>;
-    player_id?: number;
-    room?: Room,
 };
 
 export function gameUpdatePlayer(game: Game) {

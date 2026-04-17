@@ -1,21 +1,21 @@
-import { init_server } from './server.js'
-import { queue_event, flush_events } from './event_queue.js';
-import { handleNetworkEvent } from './network_event_handlers'
-import { render_chat_bubbles } from './render_chat_bubbles.js';
+import { init_server } from './server';
+import { queue_event, flush_events } from './event_queue';
+import { handleNetworkEvent } from './network_event_handlers';
+import { render_chat_bubbles } from './render_chat_bubbles';
 import { gameUpdatePlayer, get_player } from './Player';
-import { load_image, load_image_url, load_spritesheet } from './load_image.js'
+import { load_image, load_image_url, load_spritesheet } from './load_image'
 // import { render_background } from './render/render_background.js';
-import { render_players } from './render/render_player.js';
-import { clear, flushDrawBuffer, getViewport, initGraphics, render } from './CanvasRenderingContext2dGraphics.js';
-import { KeyboardInput } from './KeyboardInput.js';
-import { viewportFollowPlayer } from './viewportFollowPlayer.js';
-import { Spritesheet } from './Spritesheet.js';
-import { NetworkEvent, NetworkPacket } from './NetworkPacket.js';
-import { renderTileLayer } from './render/renderTileLayer.js';
-import { Room } from './Room.js';
+import { render_players } from './render/render_player';
+import { clear, flushDrawBuffer, getViewport, initGraphics, render } from './CanvasRenderingContext2dGraphics';
+import { KeyboardInput } from './KeyboardInput';
+import { viewportFollowPlayer } from './viewportFollowPlayer';
+import { Spritesheet } from './Spritesheet';
+import { EventPacket, NetworkEvent, NetworkPacket } from './NetworkPacket';
+import { renderTileLayer } from './render/renderTileLayer';
+import { Room } from './Room';
 import { Draw } from "./Draw";
 import { Vec2 } from '@jbwg/shared/math';
-import { renderTiled } from './render/renderTiled.js';
+import { renderTiled } from './render/renderTiled';
 
 // const networkEventHandlers: Record<string, (game: Game, event: NetworkEvent) => void> = network_event_handlers;
 
@@ -24,18 +24,32 @@ const server_address = 'localhost'
 const port = 10799
 const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
 
+export interface Player {
+    position: Vec2;
+    velocity: Vec2;
+    room: number;
+    chat_message?: any;
+    animation_time: number;
+    look_direction: string;
+};
+
+interface Server {
+    ws: WebSocket,
+    received: EventPacket[],
+}
+
 export interface Game {
     canvas: HTMLCanvasElement;
     ui: HTMLDivElement;
     chat_input: HTMLInputElement;
 
-    entities: any;
+    entities: Map<number, Player>;
 
-    server: any;
+    server: Server;
 
-    background_image: any;
-    player_sprite: any;
-    spritesheets: Record<string, Spritesheet>;
+    background_image: HTMLImageElement;
+    player_sprite: HTMLImageElement;
+    spritesheets: Record<string, Spritesheet<HTMLImageElement>>;
     tilesets: Record<string, HTMLImageElement>;
     backgrounds: Record<string, HTMLImageElement>;
     last_entered_door?: string;
@@ -61,12 +75,16 @@ async function initGame(): Promise<Game> {
 
     const server = await init_server(`ws://${server_address}:${port}`);
 
+    if (!server) {
+        throw new Error("Unable to connect to server");
+    }
+
     const entities = new Map();
 
     const background_image = await load_image_url(background_image_url);
     const player_sprite = await load_image('red_orb32');
 
-    const spritesheets: Record<string, Spritesheet> = {};
+    const spritesheets: Record<string, Spritesheet<HTMLImageElement>> = {};
 
     for (const spritesheetName of ["tileset_basic", "player_base", "player_basic_demo", "doors"]) {
         const spritesheet = await load_spritesheet(spritesheetName);
@@ -108,7 +126,9 @@ async function initGame(): Promise<Game> {
 }
 
 function step(game: Game) {
-    KeyboardInput.update();
+    // game.chat_input.focus();
+
+    console.log(KeyboardInput.isPressed("enter"));
 
     if (KeyboardInput.isPressed("enter")) {
         game.chat_input.focus();
@@ -125,15 +145,7 @@ function step(game: Game) {
         };
     };
 
-    // if (game.room) {
-    //     check_doors_for_collision(game);
-    // };
-
-    // send all buffered network events to server
     flush_events(game.server.ws)
-
-    // rendering
-    // game.graphics.clear()
 
     clear();
 
@@ -144,7 +156,6 @@ function step(game: Game) {
             viewportFollowPlayer(player);
         };
     };
-    // viewport_follow_player(game)
 
     if (game.backgrounds.blue_sky && game.backgrounds.clouds) {
         const viewport = getViewport();
@@ -157,22 +168,8 @@ function step(game: Game) {
             .remainder(clouds.width);
 
         renderTiled(clouds, game.cloudPosition);
-
-        // for (let i = 0; i < 4; i++) {
-        //     const row = i % 2;
-        //     const column = Math.floor(i / 2);
-
-        //     const cloudsDraw = Draw.image(
-        //         game.backgrounds.clouds,
-        //         viewport.left + game.cloudPosition.x - (column * clouds.width),
-        //         viewport.top + game.cloudPosition.y - (row * clouds.width),
-        //     );
-        //     render(cloudsDraw);
-        // };
     };
 
-    // render_background(game)
-    // draw_tilemap(game)
     if (game.room) {
         for (const layer of game.room.floors) {
             renderTileLayer(game.tilesets, game.room, layer);
@@ -183,16 +180,13 @@ function step(game: Game) {
             game.room.features,
             game.room.zs
         );
-    }
-    // render_room_floor(game);
-    // render_room_features(game);
-    // render_room_objects(game);
+    };
     render_players(game)
     render_chat_bubbles(game)
 
     flushDrawBuffer(true);
 
-    // game.graphics.flush_render_buffer();
+    KeyboardInput.update();
 }
 
 // function check_doors_for_collision(game: Game) {
