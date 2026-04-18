@@ -1,8 +1,13 @@
-import { eventPacketParser, EventPacket } from "./NetworkPacket"
+import { networkPacketParser, EventPacket } from "./NetworkPacket"
 
 const received: EventPacket[] = []
 
-export async function init_server(url: string) {
+export interface Server {
+    ws: WebSocket;
+    received: EventPacket[];
+}
+
+export async function init_server(url: string): Promise<Server | undefined> {
     const ws = await connect(url)
 
     if (ws) {
@@ -12,17 +17,22 @@ export async function init_server(url: string) {
 
         return { ws, received }
     }
+
+    return undefined;
 }
 
 async function connect(url: string) {
     const ws = new WebSocket(url)
     ws.onmessage = (message) => {
-        const json = message.data
-        const packet = JSON.parse(json);
-        const result = eventPacketParser(packet);
+        const json = JSON.parse(message.data);
+        const result = networkPacketParser(json);
 
         if (result.success) {
-            received.push(result.value);
+            const packet = result.value;
+
+            if (packet.tag === "events") {
+                received.push(result.value);
+            }
         }
         else {
             console.log('Unknown packet');

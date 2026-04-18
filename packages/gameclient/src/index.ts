@@ -1,16 +1,14 @@
-import { init_server } from './server';
+import { init_server, Server } from './server';
 import { queue_event, flush_events } from './event_queue';
 import { handleNetworkEvent } from './network_event_handlers';
-import { render_chat_bubbles } from './render_chat_bubbles';
+import { renderChatBubbles } from './render_chat_bubbles';
 import { gameUpdatePlayer, get_player } from './Player';
 import { load_image, load_image_url, load_spritesheet } from './load_image'
-// import { render_background } from './render/render_background.js';
 import { render_players } from './render/render_player';
 import { clear, flushDrawBuffer, getViewport, initGraphics, render } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
 import { viewportFollowPlayer } from './viewportFollowPlayer';
 import { Spritesheet } from './Spritesheet';
-import { EventPacket, NetworkEvent, NetworkPacket } from './NetworkPacket';
 import { renderTileLayer } from './render/renderTileLayer';
 import { Room } from './Room';
 import { Draw } from "./Draw";
@@ -24,18 +22,18 @@ const server_address = 'localhost'
 const port = 10799
 const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
 
+export interface ChatMessage {
+    message: string;
+    timestamp: number;
+}
+
 export interface Player {
     position: Vec2;
     velocity: Vec2;
     room: number;
-    chat_message?: any;
+    chat_message?: ChatMessage;
     animation_time: number;
     look_direction: string;
-};
-
-interface Server {
-    ws: WebSocket,
-    received: EventPacket[],
 }
 
 export interface Game {
@@ -126,10 +124,6 @@ async function initGame(): Promise<Game> {
 }
 
 function step(game: Game) {
-    // game.chat_input.focus();
-
-    console.log(KeyboardInput.isPressed("enter"));
-
     if (KeyboardInput.isPressed("enter")) {
         game.chat_input.focus();
     };
@@ -182,7 +176,7 @@ function step(game: Game) {
         );
     };
     render_players(game)
-    render_chat_bubbles(game)
+    renderChatBubbles(game)
 
     flushDrawBuffer(true);
 
@@ -234,23 +228,9 @@ game.chat_input.addEventListener("keydown", (event) => {
 });
 
 function consume_server_packets(game: Game) {
-    //Consume packets from server
     for (const packet of game.server.received) {
         for (const event of packet.events) {
-            const e = event as NetworkEvent;
-            // console.log(`received event with tag ${event.tag}`);
-
             handleNetworkEvent(game, event);
-
-            // const event_handler = networkEventHandlers[e.tag]
-
-            // if (event_handler) {
-            //     event_handler(game, event)
-            // }
-            // else {
-            //     // console.log(`packet with unknown event tag ${event.tag} received`)
-            //     console.log(event);
-            // }
         }
     }
 

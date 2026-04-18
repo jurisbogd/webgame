@@ -104,7 +104,7 @@ function transmit_player_positions(game) {
 
 function step(game) {
     // packetToBeSent = { events: [] }
-    game.packet_to_send = { events: [] }
+    game.packet_to_send = { events: [], tag: "events" }
     consumeClientPackets(game)
     flushplayersToBeDeleted(game)
 

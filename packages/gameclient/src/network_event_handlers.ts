@@ -1,11 +1,7 @@
-import { Vec2 } from "@jbwg/shared/math"
 import { set_player_id, get_player_id, get_player } from "./Player"
 import { Game } from "./index"
 import { ChatMessageEvent, DeletePlayerEvent, NetworkEvent, NewEntityEvent, SetPlayerIdEvent, SetPlayerRoomEvent, SetPositionEvent, SetRoomEvent } from "./NetworkPacket.js"
-
-// type HandlerMap<U> = {
-//     [K in U["tag"]]: (game: Game, event: Extract<U, { tag: K }>) => void;
-// };
+import { newChatBubble } from "./render_chat_bubbles";
 
 export function handleNetworkEvent(game: Game, event: NetworkEvent) {
     switch (event.tag) {
@@ -13,22 +9,12 @@ export function handleNetworkEvent(game: Game, event: NetworkEvent) {
         case "SET_POSITION": return set_position_handler(game, event);
         case "NEW_ENTITY": return new_entity_handler(game, event);
         case "DELETE_PLAYER": return delete_player_handler(game, event);
-        case "CHAT_MESSAGE": return chat_message_handler(game, event);
+        case "CHAT_MESSAGE": return chatMessageHandler(game, event);
         case "SET_ROOM": return set_room_handler(game, event);
         case "SET_PLAYER_ROOM": return set_player_room_handler(game, event);
         default: return;
     };
 }
-
-// export const network_event_handlers: HandlerMap<NetworkEvent> = {
-//     SET_PLAYER_ID: set_player_id_handler,
-//     SET_POSITION: set_position_handler,
-//     NEW_ENTITY: new_entity_handler,
-//     DELETE_PLAYER: delete_player_handler,
-//     CHAT_MESSAGE: chat_message_handler,
-//     SET_ROOM: set_room_handler,
-//     SET_PLAYER_ROOM: set_player_room_handler,
-// };
 
 function set_player_id_handler(game: Game, event: SetPlayerIdEvent) {
     const player_id = event.id
@@ -66,16 +52,9 @@ function delete_player_handler(game: Game, event: DeletePlayerEvent) {
     game.entities.delete(event.id)
 }
 
-function chat_message_handler(game: Game, event: ChatMessageEvent) {
+function chatMessageHandler(game: Game, event: ChatMessageEvent) {
     console.log(`got chat message: ${event.message}`)
-
-    const entity = game.entities.get(event.id)
-
-    if (!entity) return
-
-    const timestamp = performance.now()
-    const message = event.message
-    entity.chat_message = { timestamp, message }
+    newChatBubble(game.ui, event.id, event.message);
 }
 
 function set_room_handler(game: Game, event: SetRoomEvent) {
@@ -126,7 +105,6 @@ function find_object_by_id(room: any, id: string) {
 }
 
 function set_player_room_handler(game: Game, event: SetPlayerRoomEvent) {
-    const player_id = event.player_id;
     const room_id = event.room_id;
     const player = game.entities.get(event.player_id);
 

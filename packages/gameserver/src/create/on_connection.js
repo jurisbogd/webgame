@@ -41,7 +41,7 @@ export function on_connection(game, connection) {
 export function send_initialization_packet(game, connection, network_id, room) {
     console.log('sending initialization packet');
 
-    const packet = { events: [] };
+    const packet = { events: [], tag: "events" };
 
     packet.events.push({ tag: 'SET_PLAYER_ID', id: network_id });
 

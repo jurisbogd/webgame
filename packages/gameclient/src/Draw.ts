@@ -33,7 +33,7 @@ export function drawTile(
 }
 
 export function drawSprite(
-    spritesheet: Spritesheet,
+    spritesheet: Spritesheet<HTMLImageElement>,
     spriteName: string,
     position: Vec2,
 ) {

@@ -2,71 +2,105 @@ import { getRenderScale, getViewport } from './CanvasRenderingContext2dGraphics'
 import { Game } from './index'
 import { get_player } from './Player'
 
-const chat_bubbles = new Map()
-
-function create_chat_bubble(ui: HTMLDivElement, entity_id: number, timestamp: number) {
-    const chat_bubble_element = document.createElement('div')
-    chat_bubble_element.id = `chat-bubble${entity_id}`
-    chat_bubble_element.className = 'chat-bubble'
-
-    ui.appendChild(chat_bubble_element)
-
-    const chat_bubble = { timestamp, element: chat_bubble_element }
-
-    chat_bubbles.set(entity_id, chat_bubble)
-
-    return chat_bubble
+interface ChatBubble {
+    timestamp: number,
+    element: HTMLDivElement,
 }
 
-export function render_chat_bubbles(game: Game) {
-    const player = get_player(game)
+const playerIdChatLocationMap = new Map<number, HTMLDivElement>();
+const chatBubbles: ChatBubble[] = [];
+const chatBubbleExpireTimeMs = 5000;
+// const chatBubbleDisplayDistance = 100;
 
-    if (!player) return
+export function newChatLocation(
+    ui: HTMLDivElement,
+    playerId: number,
+) {
+    console.log(`creating new chat location for player ${playerId}`);
 
-    const player_position = player.position
+    const chatLocation = document.createElement("div");
+    chatLocation.className = "chat-location";
+    playerIdChatLocationMap.set(playerId, chatLocation);
+    ui.appendChild(chatLocation);
 
-    if (!player_position) return
+    return chatLocation;
+}
 
-    // TODO fix bug where if entity is deleted while chat bubble is being
-    // displayed then chat bubble becomes orphaned and keeps being displayed
-    // indefinitely
-    for (const [entity_id, entity] of game.entities) {
-        const chat_message = entity.chat_message
-        const position = entity.position
+export function newChatBubble(
+    ui: HTMLDivElement,
+    playerId: number,
+    message: string,
+) {
+    console.log(`creating new chat bubble for player ${playerId}`);
 
-        if (position === undefined || chat_message === undefined) continue
+    const chatLocation = playerIdChatLocationMap.get(playerId)
+        ?? newChatLocation(ui, playerId);
 
-        const chat_bubble = chat_bubbles.has(entity_id)
-            ? chat_bubbles.get(entity_id)
-            : create_chat_bubble(game.ui, entity_id, chat_message.timestamp)
+    const chatBubbleElement = document.createElement("div");
+    chatBubbleElement.className = "chat-bubble";
+    chatBubbleElement.innerText = message;
+    chatLocation.appendChild(chatBubbleElement);
 
-        const dx = player_position.x - position.x;
-        const dy = player_position.y - position.y;
-        const distance = Math.sqrt(dx * dx + dy * dy)
-        const distance_threshold = 100 // pixels
+    const chatBubble = {
+        timestamp: performance.now(),
+        element: chatBubbleElement,
+    };
 
-        const current_time = performance.now()
-        const dt = current_time - chat_message.timestamp
-        const chat_message_display_time = 5000 // ms
+    chatBubbles.push(chatBubble);
+}
 
-        if (chat_bubble.timestamp != chat_message.timestamp) {
-            chat_bubble.timestamp = chat_message.timestamp
-            chat_bubble.element.innerText = chat_message.message
+function clearExpiredChatBubbles() {
+    const currentTime = performance.now();
+
+    while (chatBubbles.length > 0 && chatBubbles[0].timestamp + chatBubbleExpireTimeMs < currentTime) {
+        console.log(`removing chat bubble`);
+
+        const chatBubble = chatBubbles.shift();
+
+        if (!chatBubble) {
+            continue;
         }
 
-        // if (entity.room !== game.room.id || distance > distance_threshold || dt > chat_message_display_time) {
-        if (distance > distance_threshold || dt > chat_message_display_time) {
-            chat_bubble.element.style.display = 'none'
-        }
-        else {
-            const render_scale = getRenderScale();
-            const viewport = getViewport();
+        chatBubble.element.remove();
+    }
+}
 
-            chat_bubble.element.style.display = 'block'
-            const position_x = (position.x - viewport.left) * render_scale;
-            const position_y = (position.y - viewport.top) * render_scale - 40;
-            chat_bubble.element.style.left = `${position_x}px`
-            chat_bubble.element.style.top = `${position_y}px`
+export function renderChatBubbles(game: Game) {
+    clearExpiredChatBubbles();
+
+    // const playerPosition = get_player(game)?.position;
+
+    for (const [playerId, chatLocation] of playerIdChatLocationMap) {
+        const otherPosition = game.entities.get(playerId)?.position;
+
+        if (!otherPosition) {
+            chatLocation.remove();
+            playerIdChatLocationMap.delete(playerId);
+            continue;
         }
+
+        // if (!playerPosition) {
+        //     chatLocation.style.display = "none";
+        //     continue;
+        // }
+
+        // const diff = playerPosition.subtract(otherPosition);
+        // const distance = diff.x !== 0 && diff.y !== 0
+        //     ? Math.sqrt(diff.x * diff.x + diff.y * diff.y)
+        //     : 0;
+
+        // if (distance > chatBubbleDisplayDistance) {
+        //     chatLocation.style.display = "none";
+        //     continue;
+        // }
+
+        const viewport = getViewport();
+        const renderScale = getRenderScale();
+        const chatLocationY = (otherPosition.x - viewport.left) * renderScale;
+        const chatLocationX = (otherPosition.y - viewport.top - 40) * renderScale;
+
+        chatLocation.style.display = "flex";
+        chatLocation.style.top = chatLocationX + "px";
+        chatLocation.style.left = chatLocationY + "px";
     }
 }

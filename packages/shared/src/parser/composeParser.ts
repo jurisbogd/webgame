@@ -26,8 +26,25 @@ export function composeParser<
     Result = { [K in keyof ParserShape]: ReturnType<ParserShape[K]> extends ParserResult<infer T> ? T : never },
 >(
     shape: ParserShape,
+): Parser<Result>;
+
+export function composeParser<
+    ParserShape extends Record<string, Parser<any>>,
+    Transformed,
+    Result = { [K in keyof ParserShape]: ReturnType<ParserShape[K]> extends ParserResult<infer T> ? T : never },
+>(
+    shape: ParserShape,
+    transform: (value: Result) => Transformed
+): Parser<Transformed>;
+
+export function composeParser<
+    ParserShape extends Record<string, Parser<any>>,
+    Transformed,
+    Result = { [K in keyof ParserShape]: ReturnType<ParserShape[K]> extends ParserResult<infer T> ? T : never },
+>(
+    shape: ParserShape,
     transform?: (value: Result) => Transformed
-): Parser<Transformed extends undefined ? Result : Transformed> {
+): Parser<any> {
     return (input: any) => {
         if (!isNotNullOrUndefined(input)) {
             return parserFail();
