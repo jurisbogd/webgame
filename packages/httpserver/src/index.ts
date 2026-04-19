@@ -1,83 +1,85 @@
-import express from "express";
+import express, { Request } from "express";
 import { getClientDist } from "./getClientDist.js";
-import { getLevelEditorDist } from "./getLevelEditorDist.js";
-import Database from "better-sqlite3";
 
 const app = express();
 
+const dbserverUrl = "http://localhost:9000";
+
 app.use(express.json());
 
-const db = new Database("game.db");
+const clientDist = getClientDist();
 
-db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
-    )
-`);
+app.use(express.static(clientDist));
+app.use("/assets", express.static("../../assets"))
 
-const dbInsertNewUser = db.prepare(`
-    INSERT INTO users (username, password)
-    VALUES (?, ?)
-`);
-
-const dbGetUserLogin = db.prepare(`
-    SELECT id, username
-    FROM users
-    WHERE username = ? AND password = ?
-`);
-
-app.post("/signup", (req, res) => {
-    const { username, password } = req.body;
-
-    if (!username || !password) {
-        return res.status(400).json({ error: "username and password required" });
-    }
-
-    try {
-        const result = dbInsertNewUser.run(username, password);
-
-        res.status(201).json({
-            message: "user created",
-            user: {
-                id: result.lastInsertRowid,
-                username
-            }
+app.use((err: unknown, req: any, res: any, next: any) => {
+    if (err instanceof SyntaxError && "status" in err && (err as any).type === "entity.parse.failed") {
+        return res.status(400).json({
+            error: "Invalid JSON body"
         });
-    } catch (err: any) {
-        if (err.code === "SQLITE_CONSTRAINT_UNIQUE") {
-            return res.status(409).json({ error: "user already exists" });
-        }
-
-        res.status(500).json({ error: "database error" });
-    }
-});
-
-app.post("/login", (req, res) => {
-    const { username, password } = req.body;
-
-    const user = dbGetUserLogin.get(username, password);
-
-    if (!user) {
-        return res.status(401).json({ error: "invalid credentials" });
     }
 
-    res.json({
-        message: "login successful",
-        user
+    console.error("Unhandled error:", err);
+
+    return res.status(500).json({
+        error: "Internal server error"
     });
 });
 
-app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+type HttpMethod =
+    | "POST"
+    | "GET";
+
+async function callDbServer(route: string, method: HttpMethod, body: any) {
+    return fetch(dbserverUrl + route, {
+        method: method,
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body)
+    });
+}
+
+app.post("/register", async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+
+        const upstream = await callDbServer("/register", "POST", {
+            username: username,
+            password: password,
+        });
+
+        const data = await upstream.json();
+        return res.status(upstream.status).json(data);
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            error: ["Internal server error"]
+        });
+    }
 });
 
-const clientDist = getClientDist();
-const levelEditorDist = getLevelEditorDist();
+app.post("/login", async (req, res) => {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
 
-app.use(express.static(clientDist));
-app.use("/leveleditor", express.static(levelEditorDist));
-app.use("/assets", express.static("../../assets"))
+        const upstream = await callDbServer("/register", "POST", {
+            username: username,
+            password: password,
+        });
+
+        const data = await upstream.json();
+        return res.status(upstream.status).json(data);
+    } catch (err) {
+        console.error(err);
+
+        return res.status(500).json({
+            error: ["Internal server error"]
+        });
+    }
+});
 
 const server = app.listen(8000)
