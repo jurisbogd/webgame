@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@jbwg/gameclient": "^1.0.0",
-    "@jbwg/leveleditor": "^1.0.0",
     "@jbwg/shared": "^1.0.0",
     "@types/ws": "^8.18.1",
     "express": "^5.2.1"
