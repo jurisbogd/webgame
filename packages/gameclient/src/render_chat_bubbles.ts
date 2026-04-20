@@ -1,6 +1,6 @@
 import { getRenderScale, getViewport } from './CanvasRenderingContext2dGraphics'
-import { Game } from './index'
-import { get_player } from './Player'
+import { Game } from './Game';
+import { getYourPlayer } from './Player'
 
 interface ChatBubble {
     timestamp: number,

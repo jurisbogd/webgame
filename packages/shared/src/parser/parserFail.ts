@@ -1,4 +1,4 @@
-import { ParserFail } from "./ParserResult";
+import { ParserFail } from "./ParserResult.js";
 
 export function parserFail<T>(reason?: string): ParserFail {
     return {

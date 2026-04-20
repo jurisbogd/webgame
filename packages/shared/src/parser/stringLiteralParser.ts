@@ -1,6 +1,6 @@
-import { Parser } from "./Parser";
-import { parserFail } from "./parserFail";
-import { parserSuccess } from "./parserSuccess";
+import { Parser } from "./Parser.js";
+import { parserFail } from "./parserFail.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function stringLiteralParser(literal: string): Parser<string> {
     return (x: any) => {

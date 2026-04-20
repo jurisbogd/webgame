@@ -2,10 +2,12 @@ import express from "express";
 import { getClientDist } from "./getClientDist.js";
 import http from "http";
 import { WebSocketServer } from "ws";
+import { GameServer } from "./GameServer.js";
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server: server });
+const gameServer = new GameServer();
 
 wss.on("connection", (ws, req) => {
     // accept only connections via /gameserver route
@@ -14,35 +16,21 @@ wss.on("connection", (ws, req) => {
         return;
     }
 
-    console.log("Client connected");
-
-    ws.on("message", (message) => {
-        const text = message.toString();
-        console.log("Received:", text);
-
-        // reply to sender
-        ws.send(`Echo: ${text}`);
-    });
-
-    ws.on("close", () => {
-        console.log("Client disconnected");
-    });
-
-    ws.on("error", (err) => {
-        console.error("WebSocket error:", err);
-    });
+    gameServer.onConnection(ws);
 });
 
 const clientDist = getClientDist();
 app.use(express.static(clientDist));
+app.use("/assets", express.static("../../assets"));
 
 // app.post("/signup", (req, res) => { });
 // app.post("/signin", (req, res) => { });
 // app.post("/signout", (req, res) => { });
 // app.get("/userdata", (req, res) => { });
 
-server.listen(3000, () => {
-    console.log("HTTP + WebSocket server listening on port 3000");
+gameServer.start();
+server.listen(8000, () => {
+    console.log("Site and server listening on port 8000");
 });
 
 // app.use(express.json());

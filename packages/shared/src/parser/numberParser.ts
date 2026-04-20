@@ -1,6 +1,6 @@
-import { parserFail } from "./parserFail";
-import { ParserResult } from "./ParserResult";
-import { parserSuccess } from "./parserSuccess";
+import { parserFail } from "./parserFail.js";
+import { ParserResult } from "./ParserResult.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function numberParser(x: any): ParserResult<number> {
     if (typeof x === "number") {

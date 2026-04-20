@@ -1,150 +1,104 @@
-import { init_server, Server } from './server';
-import { queue_event, flush_events } from './event_queue';
-import { handleNetworkEvent } from './network_event_handlers';
 import { renderChatBubbles } from './render_chat_bubbles';
-import { gameUpdatePlayer, get_player } from './Player';
-import { load_image, load_image_url, load_spritesheet } from './load_image'
+import { gameUpdatePlayer, getYourPlayer } from './Player';
 import { render_players } from './render/render_player';
 import { clear, flushDrawBuffer, getViewport, initGraphics, render } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
 import { viewportFollowPlayer } from './viewportFollowPlayer';
-import { Spritesheet } from './Spritesheet';
 import { renderTileLayer } from './render/renderTileLayer';
-import { Room } from './Room';
 import { Draw } from "./Draw";
 import { Vec2 } from '@jbwg/shared/math';
 import { renderTiled } from './render/renderTiled';
+import { Game } from './Game';
 
 // const networkEventHandlers: Record<string, (game: Game, event: NetworkEvent) => void> = network_event_handlers;
 
 // set this to address and port of server before running client
-const server_address = 'localhost'
-const port = 10799
-const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
+// const server_address = 'localhost'
+// const port = 10799
+// const background_image_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Iceberg%2C_Greenland_Sea_%28js%291.jpg/960px-Iceberg%2C_Greenland_Sea_%28js%291.jpg?_=20130127160351'
 
-export interface ChatMessage {
-    message: string;
-    timestamp: number;
-}
+// async function initGame(): Promise<Game> {
+//     const canvas = document.getElementById('canvas-2d') as HTMLCanvasElement;
 
-export interface Player {
-    position: Vec2;
-    velocity: Vec2;
-    room: number;
-    chat_message?: ChatMessage;
-    animation_time: number;
-    look_direction: string;
-}
+//     if (canvas === undefined) throw new Error("Unable to find 'canvas-2d'");
 
-export interface Game {
-    canvas: HTMLCanvasElement;
-    ui: HTMLDivElement;
-    chat_input: HTMLInputElement;
+//     initGraphics(canvas);
+//     KeyboardInput.init(canvas);
+//     const ui = document.getElementById('ui') as HTMLDivElement;
+//     const chat_input = document.getElementById('chat-input') as HTMLInputElement;
 
-    entities: Map<number, Player>;
+//     if (chat_input === undefined) throw new Error("Unable to find 'chat-input'");
+//     if (ui === undefined) throw new Error("Unable to find 'ui'");
 
-    server: Server;
 
-    background_image: HTMLImageElement;
-    player_sprite: HTMLImageElement;
-    spritesheets: Record<string, Spritesheet<HTMLImageElement>>;
-    tilesets: Record<string, HTMLImageElement>;
-    backgrounds: Record<string, HTMLImageElement>;
-    last_entered_door?: string;
+//     if (!server) {
+//         throw new Error("Unable to connect to server");
+//     }
 
-    room?: Room;
+//     const entities = new Map();
 
-    player_id?: number;
-    cloudPosition: Vec2;
-}
+//     const background_image = await load_image_url(background_image_url);
+//     const player_sprite = await load_image('red_orb32');
 
-async function initGame(): Promise<Game> {
-    const canvas = document.getElementById('canvas-2d') as HTMLCanvasElement;
+//     const spritesheets: Record<string, Spritesheet<HTMLImageElement>> = {};
 
-    if (canvas === undefined) throw new Error("Unable to find 'canvas-2d'");
+//     for (const spritesheetName of ["tileset_basic", "player_base", "player_basic_demo", "doors"]) {
+//         const spritesheet = await load_spritesheet(spritesheetName);
 
-    initGraphics(canvas);
-    KeyboardInput.init(canvas);
-    const ui = document.getElementById('ui') as HTMLDivElement;
-    const chat_input = document.getElementById('chat-input') as HTMLInputElement;
+//         if (spritesheet !== undefined) {
+//             spritesheets[spritesheetName] = spritesheet;
+//         };
+//     };
 
-    if (chat_input === undefined) throw new Error("Unable to find 'chat-input'");
-    if (ui === undefined) throw new Error("Unable to find 'ui'");
+//     const tilesets: Record<string, HTMLImageElement> = {};
+//     for (const tilesetName of ["greek_features", "greek_floors"]) {
+//         const tileset = await load_image(tilesetName);
+//         if (tileset) {
+//             tilesets[tilesetName] = tileset;
+//         };
+//     };
 
-    const server = await init_server(`ws://${server_address}:${port}`);
+//     const backgrounds: Record<string, HTMLImageElement> = {};
+//     for (const backgroundName of ["blue_sky", "clouds"]) {
+//         const background = await load_image(backgroundName);
+//         if (background) {
+//             backgrounds[backgroundName] = background;
+//         };
+//     };
 
-    if (!server) {
-        throw new Error("Unable to connect to server");
-    }
-
-    const entities = new Map();
-
-    const background_image = await load_image_url(background_image_url);
-    const player_sprite = await load_image('red_orb32');
-
-    const spritesheets: Record<string, Spritesheet<HTMLImageElement>> = {};
-
-    for (const spritesheetName of ["tileset_basic", "player_base", "player_basic_demo", "doors"]) {
-        const spritesheet = await load_spritesheet(spritesheetName);
-
-        if (spritesheet !== undefined) {
-            spritesheets[spritesheetName] = spritesheet;
-        };
-    };
-
-    const tilesets: Record<string, HTMLImageElement> = {};
-    for (const tilesetName of ["greek_features", "greek_floors"]) {
-        const tileset = await load_image(tilesetName);
-        if (tileset) {
-            tilesets[tilesetName] = tileset;
-        };
-    };
-
-    const backgrounds: Record<string, HTMLImageElement> = {};
-    for (const backgroundName of ["blue_sky", "clouds"]) {
-        const background = await load_image(backgroundName);
-        if (background) {
-            backgrounds[backgroundName] = background;
-        };
-    };
-
-    return {
-        canvas,
-        ui,
-        chat_input,
-        entities,
-        server,
-        background_image,
-        player_sprite,
-        spritesheets,
-        tilesets,
-        backgrounds,
-        cloudPosition: Vec2.zero,
-    };
-}
+//     return {
+//         canvas,
+//         ui,
+//         chat_input,
+//         entities,
+//         server,
+//         background_image,
+//         player_sprite,
+//         spritesheets,
+//         tilesets,
+//         backgrounds,
+//         cloudPosition: Vec2.zero,
+//     };
+// }
 
 function step(game: Game) {
     if (KeyboardInput.isPressed("enter")) {
-        game.chat_input.focus();
+        game.chatInput.focus();
     };
-
-    consume_server_packets(game)
 
     gameUpdatePlayer(game);
 
     {
-        const player = get_player(game);
+        const player = getYourPlayer(game);
         if (player !== undefined) {
-            queue_event({ tag: "SET_POSITION", position: player.position, velocity: player.velocity });
+            // queue_event({ tag: "SET_POSITION", position: player.position, velocity: player.velocity });
         };
     };
-
-    flush_events(game.server.ws)
 
     clear();
 
     {
-        const player = get_player(game)
+        const player = getYourPlayer(game)
 
         if (player) {
             viewportFollowPlayer(player);
@@ -212,30 +166,9 @@ function step(game: Game) {
 //     }
 // }
 
-const game = await initGame();
+// const game = await initGame();
 
-game.chat_input.addEventListener("keydown", (event) => {
-    if (event.code === 'Enter') {
-        const message = game.chat_input.value
-
-        if (message != '') {
-            queue_event({ tag: 'CHAT_MESSAGE', message: message })
-            game.chat_input.value = ''
-        }
-
-        game.canvas.focus()
-    }
-});
-
-function consume_server_packets(game: Game) {
-    for (const packet of game.server.received) {
-        for (const event of packet.events) {
-            handleNetworkEvent(game, event);
-        }
-    }
-
-    game.server.received.length = 0
-}
+const game = await Game.init();
 
 const run = () => {
     step(game)

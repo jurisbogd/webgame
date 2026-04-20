@@ -1,6 +1,6 @@
 import { Vec2 } from "@jbwg/shared/math";
 import { Parser, parser } from "@jbwg/shared/parser"
-import { Room, roomParser } from "./Room";
+import { Room, roomParser } from "@jbwg/shared/game";
 
 export interface SetPositionEvent extends NetworkEventBase {
     tag: "SET_POSITION";

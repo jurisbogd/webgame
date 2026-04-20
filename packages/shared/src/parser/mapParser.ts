@@ -1,6 +1,6 @@
-import { Parser } from "./Parser";
-import { parserFail } from "./parserFail";
-import { parserSuccess } from "./parserSuccess";
+import { Parser } from "./Parser.js";
+import { parserFail } from "./parserFail.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function mapParser<T>(itemParser: Parser<T>): Parser<Map<string, T>> {
     return (o: any) => {

@@ -11,7 +11,8 @@
     "./utils": "./dist/utils.js",
     "./math": "./dist/math.js",
     "./parser": "./dist/parser.js",
-    "./graphics": "./dist/graphics.js"
+    "./graphics": "./dist/graphics.js",
+    "./game": "./dist/game.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",

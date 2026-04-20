@@ -1,7 +1,7 @@
-import { isNotNullOrUndefined } from "../utils";
-import { Parser } from "./Parser";
-import { parserFail, parserRefail } from "./parserFail";
-import { parserSuccess } from "./parserSuccess";
+import { isNotNullOrUndefined } from "../utils.js";
+import type { Parser } from "./Parser";
+import { parserFail, parserRefail } from "./parserFail.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function arrayParser<T>(itemParser: Parser<T>, skipFailed?: boolean): Parser<T[]> {
     return (xs: any) => {

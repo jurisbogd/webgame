@@ -21,7 +21,7 @@
     "path": "^0.12.7"
   },
   "dependencies": {
-    "@jbwg/gameclient": "*",
+    "@jbwg/gameclient": "^1.0.0",
     "@jbwg/leveleditor": "^1.0.0",
     "@jbwg/shared": "^1.0.0",
     "@types/ws": "^8.18.1",

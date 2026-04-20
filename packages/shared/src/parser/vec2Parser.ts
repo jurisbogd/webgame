@@ -1,6 +1,6 @@
-import { Vec2 } from "../math";
-import { composeParser } from "./composeParser";
-import { numberParser } from "./numberParser";
+import { Vec2 } from "../math.js";
+import { composeParser } from "./composeParser.js";
+import { numberParser } from "./numberParser.js";
 
 export const vec2Parser = composeParser(
     {

@@ -1,8 +1,9 @@
 import { Vec2 } from '@jbwg/shared/math';
 import { render } from '../CanvasRenderingContext2dGraphics';
 import { Draw, drawSprite } from '../Draw';
-import { Game, Player } from '../index';
-import { get_player } from '../Player';
+import { Player } from '../Game';
+import { Game } from '../Game';
+import { getYourPlayer } from '../Player';
 
 export function render_players(game: Game) {
     for (const entity of game.entities.values()) {
@@ -32,10 +33,10 @@ function render_player(game: Game, player: Player) {
 
     // if (position === undefined || previous_position === undefined) return;
 
-    if (velocity.y > 0) player.look_direction = 'down';
-    else if (velocity.y < 0) player.look_direction = 'up';
-    else if (velocity.x > 0) player.look_direction = 'right';
-    else if (velocity.x < 0) player.look_direction = 'left';
+    if (velocity.y > 0) player.lookDirection = 'down';
+    else if (velocity.y < 0) player.lookDirection = 'up';
+    else if (velocity.x > 0) player.lookDirection = 'right';
+    else if (velocity.x < 0) player.lookDirection = 'left';
 
     const spritesheet = game.spritesheets.player_base;
 
@@ -43,26 +44,26 @@ function render_player(game: Game, player: Player) {
     if (velocity.x !== 0 || velocity.y) {
         let animation;
 
-        if (player.look_direction === 'right') animation = 'walk_right';
-        else if (player.look_direction === 'left') animation = 'walk_left';
-        else if (player.look_direction === 'down') animation = 'walk_down';
+        if (player.lookDirection === 'right') animation = 'walk_right';
+        else if (player.lookDirection === 'left') animation = 'walk_left';
+        else if (player.lookDirection === 'down') animation = 'walk_down';
         else animation = 'walk_up';
 
         const sheetAnimation = spritesheet.animations[animation];
 
-        player.animation_time = (player.animation_time + 1 / 60) % sheetAnimation.duration;
-        const frameIdx = Math.floor(player.animation_time / sheetAnimation.duration * sheetAnimation.frames.length);
+        player.animationTime = (player.animationTime + 1 / 60) % sheetAnimation.duration;
+        const frameIdx = Math.floor(player.animationTime / sheetAnimation.duration * sheetAnimation.frames.length);
         frame = sheetAnimation.frames[frameIdx];
 
         // frame = spritesheet.get_animation_frame(animation, player.animation_time);
         // player.animation_time = spritesheet.step_animation_time(animation, player.animation_time);
     }
     else {
-        if (player.look_direction === 'right') frame = 'look_right';
-        else if (player.look_direction === 'left') frame = 'look_left';
-        else if (player.look_direction === 'down') frame = 'look_down';
+        if (player.lookDirection === 'right') frame = 'look_right';
+        else if (player.lookDirection === 'left') frame = 'look_left';
+        else if (player.lookDirection === 'down') frame = 'look_down';
         else frame = 'look_up';
-        player.animation_time = 0;
+        player.animationTime = 0;
     }
 
     const draw = drawSprite(spritesheet, frame, position);

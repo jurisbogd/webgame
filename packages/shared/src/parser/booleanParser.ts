@@ -1,5 +1,5 @@
-import { parserFail } from "./parserFail";
-import { parserSuccess } from "./parserSuccess";
+import { parserFail } from "./parserFail.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function booleanParser(x: any) {
     if (typeof x === "boolean") {

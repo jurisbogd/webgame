@@ -1,7 +1,7 @@
-import { Rect } from "../math";
-import { composeParser } from "./composeParser";
-import { numberParser } from "./numberParser";
-import { Parser } from "./Parser";
+import { Rect } from "../math.js";
+import { composeParser } from "./composeParser.js";
+import { numberParser } from "./numberParser.js";
+import { Parser } from "./Parser.js";
 
 export const rectParser: Parser<Rect> = composeParser({
     x: numberParser,

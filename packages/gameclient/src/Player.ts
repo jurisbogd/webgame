@@ -1,8 +1,8 @@
 import { Rect, Vec2 } from '@jbwg/shared/math'
 import { KeyboardInput } from './KeyboardInput'
-import { axisSeparatedCollisionTrace } from './axisSeparatedCollision';
-import { Room } from './Room';
-import { Game, Player } from './index';
+import { Room, axisSeparatedCollisionTrace } from "@jbwg/shared/game";
+import { Player } from './Game';
+import { Game } from './Game';
 
 function playerInputProcess(player: Player) {
     const speed = 1.5;
@@ -20,7 +20,7 @@ function resolveCollisions(player: Player, room: Room) {
 };
 
 export function gameUpdatePlayer(game: Game) {
-    const player = get_player(game);
+    const player = getYourPlayer(game);
 
     if (player === undefined) return;
 
@@ -31,18 +31,18 @@ export function gameUpdatePlayer(game: Game) {
         : player.position.add(player.velocity);
 };
 
-export function get_player(game: Game) {
-    if (game.player_id !== undefined) {
-        return game.entities.get(game.player_id)
+export function getYourPlayer(game: Game) {
+    if (game.yourNetworkId !== undefined) {
+        return game.entities.get(game.yourNetworkId)
     }
 
     return undefined;
 }
 
-export function get_player_id(game: Game) {
-    return game.player_id
+export function getYourNetworkId(game: Game) {
+    return game.yourNetworkId
 }
 
-export function set_player_id(game: Game, player_id: number) {
-    game.player_id = player_id
+export function setYourNetworkId(game: Game, networkId: number) {
+    game.yourNetworkId = networkId
 }

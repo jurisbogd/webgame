@@ -7,15 +7,18 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @jbwg/shared && npm run build -w @jbwg/gameclient && npm run build -w @jbwg/gameserver && npm run build -w @jbwg/httpserver && npm run build -w @jbwg/httpserver",
+    "build": "npm run build -w @jbwg/shared && npm run build -w @jbwg/gameclient && npm run build -w @jbwg/combserver",
+    "build:shared": "npm run build -w @jbwg/shared",
     "build:gameclient": "npm run build -w @jbwg/gameclient",
     "build:httpserver": "npm run build -w @jbwg/httpserver",
     "build:gameserver": "npm run build -w @jbwg/gameserver",
     "build:dbserver": "npm run build -w @jbwg/dbserver",
+    "build:combserver": "npm run build -w @jbwg/combserver",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:gameserver": "npm run start -w @jbwg/gameserver",
     "start:httpserver": "npm run start -w @jbwg/httpserver",
-    "start:dbserver": "npm run start -w @jbwg/dbserver"
+    "start:dbserver": "npm run start -w @jbwg/dbserver",
+    "start:combserver": "npm run start -w @jbwg/combserver"
   },
   "keywords": [],
   "author": "",

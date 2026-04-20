@@ -1,8 +1,8 @@
-import { isNotNullOrUndefined } from "../utils";
-import { Parser } from "./Parser";
-import { parserFail, parserRefail } from "./parserFail";
-import { stringParser } from "./stringParser";
-import { parserSuccess } from "./parserSuccess";
+import { isNotNullOrUndefined } from "../utils.js";
+import { Parser } from "./Parser.js";
+import { parserFail, parserRefail } from "./parserFail.js";
+import { stringParser } from "./stringParser.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 type TaggedUnionParserResult<
     TagField extends string,

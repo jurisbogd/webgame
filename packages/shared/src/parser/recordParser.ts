@@ -1,8 +1,8 @@
-import { isNotNullOrUndefined } from "../utils";
-import { Parser } from "./Parser";
-import { parserFail } from "./parserFail";
-import { ParserResult } from "./ParserResult";
-import { parserSuccess } from "./parserSuccess";
+import { isNotNullOrUndefined } from "../utils.js";
+import { Parser } from "./Parser.js";
+import { parserFail } from "./parserFail.js";
+import { ParserResult } from "./ParserResult.js";
+import { parserSuccess } from "./parserSuccess.js";
 
 export function recordParser<T>(
     itemParser: Parser<T>

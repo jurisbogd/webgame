@@ -14,5 +14,5 @@ export function isNumber(o: unknown) {
     return typeof o === "number";
 };
 
-export { SpatialMap } from "./room/Room";
-export { init2dArray } from "./room/Room";
+export { SpatialMap } from "./room/Room.js";
+export { init2dArray } from "./room/Room.js";

@@ -7,8 +7,8 @@ export interface Server {
     received: EventPacket[];
 }
 
-export async function init_server(url: string): Promise<Server | undefined> {
-    const ws = await connect(url)
+export async function initServer(url: string, onMessage: (message: MessageEvent<any>) => void): Promise<Server | undefined> {
+    const ws = await connect(url, onMessage)
 
     if (ws) {
         ws.onerror = (error) => {
@@ -21,24 +21,9 @@ export async function init_server(url: string): Promise<Server | undefined> {
     return undefined;
 }
 
-async function connect(url: string) {
+async function connect(url: string, onMessage: (message: MessageEvent<any>) => void) {
     const ws = new WebSocket(url)
-    ws.onmessage = (message) => {
-        const json = JSON.parse(message.data);
-        const result = networkPacketParser(json);
-
-        if (result.success) {
-            const packet = result.value;
-
-            if (packet.tag === "events") {
-                received.push(result.value);
-            }
-        }
-        else {
-            console.log('Unknown packet');
-            console.log(result.reason);
-        };
-    }
+    ws.onmessage = onMessage;
     return new Promise<WebSocket | undefined>((resolve, reject) => {
         ws.onopen = () => resolve(ws);
         ws.onerror = (err) => resolve(undefined);
