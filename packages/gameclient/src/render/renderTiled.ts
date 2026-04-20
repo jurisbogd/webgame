@@ -14,7 +14,8 @@ export function renderTiled(image: HTMLImageElement, offset: Vec2) {
             const position = new Vec2(i, j)
                 .multiply(imageSize)
                 .add(offset)
-                .add(new Vec2(viewport.left, viewport.top));
+                .add(new Vec2(viewport.left, viewport.top))
+            // .floor();
 
             const draw = Draw.image(image, position.x, position.y);
             render(draw);

@@ -23,7 +23,9 @@
   "dependencies": {
     "@jbwg/gameclient": "^1.0.0",
     "@jbwg/shared": "^1.0.0",
+    "@types/cookie-parser": "^1.4.10",
     "@types/ws": "^8.18.1",
+    "cookie-parser": "^1.4.7",
     "express": "^5.2.1"
   }
 }

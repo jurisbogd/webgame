@@ -4,7 +4,7 @@ import { initServer } from './server';
 import { Spritesheet } from './Spritesheet';
 import { initGraphics } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
-import { loadImage, loadSpritesheet } from './loadImage';
+import { loadImage, loadSpritesheet } from "./loadImage"
 import { Parser, parser } from '@jbwg/shared/parser';
 import { newChatBubble } from './render/renderChatBubbles';
 
@@ -49,9 +49,9 @@ export class Player implements Player {
             name = undefined;
         }
 
-        name = name ?? isGuest
+        name = name ?? (isGuest
             ? `Player ${networkId}`
-            : "";
+            : "");
 
         this.name = name;
     }
@@ -74,6 +74,7 @@ export interface Game {
     latestSnapshotInputTimestamp: number;
     lastFastForward: number;
 
+
     room?: Room;
 
     yourNetworkId?: number;
@@ -92,6 +93,8 @@ export class Game implements Game {
     lastFastForward: number = 0;
     snapshotBuffer: SnapshotPacket[] = [];
     renderTime: number = 0;
+    showHighlights = false;
+    noclip = false;
 
     dtMod = 0;
     firstSnapshot = true;

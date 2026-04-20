@@ -10,19 +10,62 @@
 
 <body>
     <div id="main-column">
+        <div id="topbar-container" class="container">
+            <div id="topbar-logged-in" class="topbar hidden">
+                <div id="username"></div>
+                <button id="logout-button" class="cbutton">Logout</button>
+            </div>
+            <div id="topbar-logged-out" class="topbar hidden">
+                <button id="register-button" class="cbutton">Register</button>
+                <button id="login-button" class="cbutton">Login</button>
+            </div>
+        </div>
         <div id="game-container" class="container">
             <div id="canvas-container" class="container">
                 <canvas id="canvas-2d" width="900" height="720" tabindex="0"></canvas>
                 <div id="ui"></div>
+                <div id="door-prompt-layer">
+                    <div id="door-prompt">Press <span class="key-prompt">E</span> to enter</div>
+                </div>
+                <div id="overlay">
+                    <button id="start-game-button" class="cbutton">Start game</button>
+                </div>
+                <div id="highlight-layer"></div>
+                <div id="loading">Loading...</div>
             </div>
             <div id="chatbox-container" class="container">
                 <div id="chatbox">
                     <div id="chatbox-content"></div>
-                    <textarea id="chatbox-input" placeholder="Press enter to start chatting..."></textarea>
+                    <textarea disabled id="chatbox-input" placeholder="Press enter to start chatting..."></textarea>
                 </div>
             </div>
         </div>
     </div>
+    <div id="login-form-panel" class="auth-panel hidden">
+        <form id="login-form" novalidate>
+            <input type="text" id="login-username" name="username" placeholder="Username" required />
+            <input type="password" id="login-password" name="password" placeholder="Password" required />
+
+            <div id="login-form-errors" class="errors"></div>
+
+            <button class="cbutton" type="submit">Login</button>
+        </form>
+        <button id="cancel-login" class="cbutton">Cancel</button>
+    </div>
+    <div id="register-form-panel" class="auth-panel hidden">
+        <form id="register-form" novalidate>
+            <input type="text" id="register-username" name="username" placeholder="Username" required />
+            <input type="password" id="register-password" name="password" placeholder="Password" required />
+            <input type="password" id="register-password-confirm" name="password-confirm" placeholder="Confirm password"
+                required />
+
+            <div id="register-form-errors" class="errors"></div>
+
+            <button class="cbutton" type="submit">Register</button>
+        </form>
+        <button id="cancel-register" class="cbutton">Cancel</button>
+    </div>
+    <div id="auth-panel-overlay" class="hidden"></div>
 </body>
 
 </html>

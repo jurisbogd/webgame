@@ -1,6 +1,6 @@
 import { Vec2 } from "@jbwg/shared/math";
 import { drawTile } from "../Draw";
-import { Room, TileLayer } from "../Room";
+import { Room, TileLayer } from "@jbwg/shared/game";
 import { render } from "../CanvasRenderingContext2dGraphics";
 
 type Tilesets = Record<string, HTMLImageElement>;

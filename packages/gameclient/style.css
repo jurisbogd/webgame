@@ -17,9 +17,24 @@ body {
 
 .container {
     font: inherit;
-    display: block;
+    display: flex;
     margin: 0 auto;
     /* margin-bottom: 20px; */
+}
+
+#topbar-container {
+    /* align-items: center; */
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.topbar {
+    margin-left: auto;
+    /* pushes entire group to the right */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    /* space between text and button */
 }
 
 #game-container {
@@ -33,11 +48,157 @@ body {
     border: 2px solid #444444;
 }
 
+#username {
+    color: #AAAAAA;
+}
+
 #canvas-container {
     font: inherit;
     width: 900px;
     height: 720px;
     position: relative;
+}
+
+#overlay {
+    font: inherit;
+    position: absolute;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    background: rgba(0, 0, 0, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.topbar.hidden,
+#overlay.hidden,
+#loading.hidden,
+#auth-panel-overlay.hidden,
+.auth-panel.hidden {
+    display: none;
+}
+
+#loading {
+    color: #AAAAAA;
+    font: inherit;
+    position: absolute;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    background: rgba(0, 0, 0, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+.auth-panel {
+    font: inherit;
+    position: absolute;
+    box-sizing: border-box;
+    width: 400px;
+    border: 2px solid #444444;
+    background-color: #333333;
+    height: 300px;
+    padding: 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 20;
+}
+
+.highlight {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    pointer-events: none;
+    background-color: #FFFF0099;
+    outline: 2px solid #FFFF00;
+}
+
+.chatbox-message {
+    padding: 5px;
+    background-color: #222222;
+    color: #AAAAAA;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.auth-panel>form {
+    width: 100%;
+}
+
+#auth-panel-overlay {
+    font: inherit;
+    position: absolute;
+    inset: 0;
+    /* top:0; right:0; bottom:0; left:0 */
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 15;
+}
+
+.cinput {
+    font: inherit;
+    box-sizing: border-box;
+    width: 100%;
+    border: 2px solid #444444;
+    background-color: #111111;
+}
+
+.cinput:hover {
+    color: #AAAAAA;
+    background-color: #222222;
+}
+
+.cinput:active {
+    background-color: #333333;
+}
+
+.cinput:focus {
+    color: #AAAAAA;
+    background-color: #333333;
+}
+
+.errors {
+    color: red;
+    box-sizing: border-box;
+    max-height: 150px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+
+#loading.hidden {
+    display: none;
+}
+
+button {
+    all: unset;
+    cursor: pointer;
+}
+
+.cbutton {
+    font: inherit;
+    color: #AAAAAA;
+    border: 2px solid #444444;
+    background-color: #222222;
+    outline: none;
+    text-align: center;
+    padding: 2px;
+}
+
+.cbutton:hover {
+    color: #AAAAAA;
+    background-color: #777777;
+}
+
+.cbutton:active {
+    background-color: #999999;
 }
 
 #chatbox-container {
@@ -59,6 +220,7 @@ body {
     flex-direction: column;
     width: 100%;
     height: 100%;
+    padding: 5px;
     max-width: 100%;
 }
 
@@ -104,6 +266,7 @@ body {
 }
 
 #ui,
+#door-prompt-layer,
 canvas {
     font: inherit;
     width: 100%;
@@ -112,11 +275,34 @@ canvas {
     overflow: hidden;
 }
 
+#door-prompt {
+    font: inherit;
+    padding: 4px;
+    background-color: #333333AA;
+    border: 2px solid #AAAAAA;
+    width: max-content;
+    flex-shrink: 0;
+    color: white;
+    margin-top: 2px;
+
+    position: absolute;
+    max-width: 200px;
+    flex-shrink: 0;
+    display: block;
+}
+
+#key-prompt {
+    border: 5px outset #444444;
+    color: yellow;
+    background-color: #444444;
+}
+
 canvas:focus {
     outline: none;
 }
 
-#ui {
+#ui,
+#door-prompt-layer {
     pointer-events: none;
 }
 

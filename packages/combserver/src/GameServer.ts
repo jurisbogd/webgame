@@ -44,11 +44,12 @@ export class GameServer {
     rooms = new Map<string, Room>();
     players = new Map<number, Player>();
 
-    onConnection(ws: WebSocket) {
+    onConnection(ws: WebSocket, isGuest: boolean, username?: string) {
         const player: Player = {
             ws: ws,
             latestInputTimestamp: 0,
-            isGuest: true,
+            isGuest: isGuest,
+            name: username,
             networkId: this.nextPlayerId(),
             position: Vec2.zero,
             velocity: Vec2.zero,
@@ -56,7 +57,7 @@ export class GameServer {
 
         this.newPlayer(player);
 
-        console.log(`Client ${player.networkId} connected`);
+        console.log(`Client ${player.networkId}${username ? ", with username " + username : ""} connected`);
 
         ws.addEventListener("close", (event) => {
             console.log(`Client ${player.networkId} disconnected`);

@@ -6,6 +6,9 @@ const inputs = [
     "left",
     "right",
     "enter",
+    "interact",
+    "highlight",
+    "noclip",
 ];
 
 export enum InputState {
@@ -23,6 +26,9 @@ const keyBindings: Record<string, Input> = {
     "KeyA": "left",
     "KeyS": "down",
     "KeyD": "right",
+    "KeyE": "interact",
+    "KeyH": "highlight",
+    "KeyN": "noclip",
     "ArrowUp": "up",
     "ArrowDown": "down",
     "ArrowLeft": "left",

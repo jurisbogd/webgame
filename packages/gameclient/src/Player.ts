@@ -23,6 +23,10 @@ export function gameUpdatePlayer(game: Game) {
     game.inputBuffer = game.inputBuffer.filter(i => i.timestamp > game.latestSnapshotInputTimestamp);
     const player = getYourPlayer(game);
 
+    const room = game.noclip
+        ? undefined
+        : game.room;
+
     if (!player) return;
 
     if (game.lastFastForward < game.latestSnapshotInputTimestamp) {
@@ -33,7 +37,7 @@ export function gameUpdatePlayer(game: Game) {
         for (const input of game.inputBuffer) {
             const movementDirection = input.movementDirection;
 
-            const { position, velocity } = movePlayer(player.position, movementDirection, game.room);
+            const { position, velocity } = movePlayer(player.position, movementDirection, room);
             player.position = position;
             player.velocity = velocity;
         }
@@ -42,7 +46,7 @@ export function gameUpdatePlayer(game: Game) {
 
     const movementDirection = KeyboardInput.movementDirection();
 
-    const { position, velocity } = movePlayer(player.position, movementDirection, game.room);
+    const { position, velocity } = movePlayer(player.position, movementDirection, room);
     player.position = position;
     player.velocity = velocity;
 };
