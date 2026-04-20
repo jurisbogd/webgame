@@ -1,10 +1,10 @@
 import { InitPacket, PlayerAttributes, PlayerSnapshot, ClientPacket, Room, roomParser, ServerPacket, SnapshotPacket, ClientInputPacket, movePlayer } from '@jbwg/shared/game';
 import { Vec2 } from '@jbwg/shared/math';
-import { initServer, Server } from './server';
+import { initServer } from './server';
 import { Spritesheet } from './Spritesheet';
 import { initGraphics } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
-import { loadImage, loadSpritesheet } from './load_image';
+import { loadImage, loadSpritesheet } from './loadImage';
 import { Parser, parser } from '@jbwg/shared/parser';
 import { newChatBubble } from './renderChatBubbles';
 
@@ -65,7 +65,7 @@ export interface Game {
 
     entities: Map<number, Player>;
 
-    server?: Server;
+    ws?: WebSocket;
 
     player_sprite: HTMLImageElement;
     spritesheets: Record<string, Spritesheet<HTMLImageElement>>;
@@ -168,7 +168,7 @@ export class Game implements Game {
             throw new Error("Unable to connect to server");
         }
 
-        game.server = server;
+        game.ws = server;
 
         for (const spritesheetName of ["tileset_basic", "player_base", "player_basic_demo", "doors"]) {
             const spritesheet = await loadSpritesheet(spritesheetName);
@@ -396,8 +396,8 @@ export class Game implements Game {
     }
 
     sendToServer(packet: ClientPacket) {
-        if (this.server) {
-            this.server.ws.send(JSON.stringify(packet));
+        if (this.ws) {
+            this.ws.send(JSON.stringify(packet));
         }
     }
 

@@ -1,13 +1,4 @@
-import { networkPacketParser, EventPacket } from "./NetworkPacket"
-
-const received: EventPacket[] = []
-
-export interface Server {
-    ws: WebSocket;
-    received: EventPacket[];
-}
-
-export async function initServer(url: string, onMessage: (message: MessageEvent<any>) => void): Promise<Server | undefined> {
+export async function initServer(url: string, onMessage: (message: MessageEvent<any>) => void): Promise<WebSocket | undefined> {
     const ws = await connect(url, onMessage)
 
     if (ws) {
@@ -15,7 +6,7 @@ export async function initServer(url: string, onMessage: (message: MessageEvent<
             console.error(error)
         }
 
-        return { ws, received }
+        return ws;
     }
 
     return undefined;
