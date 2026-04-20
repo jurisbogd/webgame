@@ -383,16 +383,18 @@ export class Game implements Game {
 
                 this.snapshotBuffer.push(snapshot);
 
-                for (const playerSnapshot of snapshot.players) {
-                    const player = this.entities.get(playerSnapshot.networkId);
-
-                    if (!player) {
-                        continue;
+                if (!this.noclip) {
+                    for (const playerSnapshot of snapshot.players) {
+                        const player = this.entities.get(playerSnapshot.networkId);
+    
+                        if (!player) {
+                            continue;
+                        }
+    
+                        player.latestPosition = playerSnapshot.position;
+                        player.latestVelocity = playerSnapshot.velocity;
+                        player.latestRoom = playerSnapshot.room;
                     }
-
-                    player.latestPosition = playerSnapshot.position;
-                    player.latestVelocity = playerSnapshot.velocity;
-                    player.latestRoom = playerSnapshot.room;
                 }
 
                 return;
