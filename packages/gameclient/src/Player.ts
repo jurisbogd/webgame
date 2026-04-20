@@ -21,27 +21,32 @@ import { Game } from './Game';
 
 export function gameUpdatePlayer(game: Game) {
     game.inputBuffer = game.inputBuffer.filter(i => i.timestamp > game.latestSnapshotInputTimestamp);
-    const player = getYourPlayer(game);
 
     const room = game.noclip
         ? undefined
         : game.room;
 
+    const player = getYourPlayer(game);
+    
     if (!player) return;
 
-    if (game.lastFastForward < game.latestSnapshotInputTimestamp) {
-        player.position = player.latestPosition;
-        player.velocity = player.latestVelocity;
-        player.room = player.latestRoom;
-        // fast forward inputs
-        for (const input of game.inputBuffer) {
-            const movementDirection = input.movementDirection;
-
-            const { position, velocity } = movePlayer(player.position, movementDirection, room);
-            player.position = position;
-            player.velocity = velocity;
+    if (!game.noclip) {
+    
+    
+        if (game.lastFastForward < game.latestSnapshotInputTimestamp) {
+            player.position = player.latestPosition;
+            player.velocity = player.latestVelocity;
+            player.room = player.latestRoom;
+            // fast forward inputs
+            for (const input of game.inputBuffer) {
+                const movementDirection = input.movementDirection;
+    
+                const { position, velocity } = movePlayer(player.position, movementDirection, room);
+                player.position = position;
+                player.velocity = velocity;
+            }
+            game.lastFastForward = game.latestSnapshotInputTimestamp;
         }
-        game.lastFastForward = game.latestSnapshotInputTimestamp;
     }
 
     const movementDirection = KeyboardInput.movementDirection();

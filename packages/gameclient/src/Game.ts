@@ -253,7 +253,7 @@ export class Game implements Game {
                     ep = earlier.players[eidx];
                 }
 
-                if (ep?.networkId === lp.networkId) {
+                if (ep?.networkId === lp.networkId && ep?.room === lp.room) {
                     const position = lp.position
                         .subtract(ep.position)
                         .multiply(interpolationFactor)
@@ -383,16 +383,18 @@ export class Game implements Game {
 
                 this.snapshotBuffer.push(snapshot);
 
-                for (const playerSnapshot of snapshot.players) {
-                    const player = this.entities.get(playerSnapshot.networkId);
-
-                    if (!player) {
-                        continue;
+                if (!this.noclip) {
+                    for (const playerSnapshot of snapshot.players) {
+                        const player = this.entities.get(playerSnapshot.networkId);
+    
+                        if (!player) {
+                            continue;
+                        }
+    
+                        player.latestPosition = playerSnapshot.position;
+                        player.latestVelocity = playerSnapshot.velocity;
+                        player.latestRoom = playerSnapshot.room;
                     }
-
-                    player.latestPosition = playerSnapshot.position;
-                    player.latestVelocity = playerSnapshot.velocity;
-                    player.latestRoom = playerSnapshot.room;
                 }
 
                 return;
