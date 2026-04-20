@@ -194,7 +194,7 @@ export class GameServer {
     }
 
     start() {
-        const timeStep = 1000 / 15; // 15 fps
+        const timeStep = 1000 / 10; // 10 fps
         setInterval(() => this.step(), timeStep);
     }
 

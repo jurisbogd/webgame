@@ -107,7 +107,9 @@ app.post("/register", (req, res) => {
         const session = registerResult.value;
 
         setSessionCookie(res, session.token, session.expiresAt);
-        return res.status(200);
+        return res.status(200).json({
+            message: "Registered successfully",
+        });
     }
     else {
         return res.status(400).json({
