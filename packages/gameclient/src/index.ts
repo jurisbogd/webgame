@@ -1,9 +1,9 @@
-import { renderChatBubbles } from './renderChatBubbles';
+import { renderPlayerOverheads } from './render/renderChatBubbles';
 import { gameUpdatePlayer, getYourPlayer } from './Player';
 import { render_players } from './render/render_player';
-import { clear, flushDrawBuffer, getViewport, initGraphics, render } from './CanvasRenderingContext2dGraphics';
+import { clear, flushDrawBuffer, getViewport, render } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
-import { viewportFollowPlayer } from './viewportFollowPlayer';
+import { viewportFollowPlayer } from './render/viewportFollowPlayer';
 import { renderTileLayer } from './render/renderTileLayer';
 import { Draw } from "./Draw";
 import { Vec2 } from '@jbwg/shared/math';
@@ -72,7 +72,7 @@ function step(game: Game) {
         );
     };
     render_players(game)
-    renderChatBubbles(game)
+    renderPlayerOverheads(game)
 
     flushDrawBuffer(true);
 

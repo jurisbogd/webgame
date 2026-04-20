@@ -28,6 +28,7 @@ export function gameUpdatePlayer(game: Game) {
     if (game.lastFastForward < game.latestSnapshotInputTimestamp) {
         player.position = player.latestPosition;
         player.velocity = player.latestVelocity;
+        player.room = player.latestRoom;
         // fast forward inputs
         for (const input of game.inputBuffer) {
             const movementDirection = input.movementDirection;

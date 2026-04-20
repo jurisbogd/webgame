@@ -6,7 +6,7 @@ import { initGraphics } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
 import { loadImage, loadSpritesheet } from './loadImage';
 import { Parser, parser } from '@jbwg/shared/parser';
-import { newChatBubble } from './renderChatBubbles';
+import { newChatBubble } from './render/renderChatBubbles';
 
 export interface ChatMessage {
     message: string;
@@ -197,7 +197,7 @@ export class Game implements Game {
 
     interpolateSnapshots() {
         if (!this.firstSnapshot) {
-            const timeToLatest = this.latestSnapshotTimestamp - this.renderTime;
+            const timeToLatest = this.latestSnapshotInputTimestamp - this.renderTime;
 
             if (timeToLatest < 100) {
                 this.dtMod = -0.1;
@@ -205,39 +205,38 @@ export class Game implements Game {
             else if (timeToLatest < 200) {
                 this.dtMod = -0.01;
             }
-            else if (timeToLatest < 300 && timeToLatest > 250) {
+            else if (timeToLatest < 300 && timeToLatest >= 250) {
                 this.dtMod = 0;
             }
-            else if (timeToLatest >= 300) {
+            else if (timeToLatest < 1000 && timeToLatest >= 300) {
                 this.dtMod = 0.01;
+            }
+            else if (timeToLatest >= 1000) {
+                this.renderTime = this.latestSnapshotInputTimestamp - 500;
             }
 
             const dt = 1000 / 60;
 
             this.renderTime += dt + (dt * this.dtMod);
-            this.renderTime = Math.min(this.renderTime, this.latestSnapshotTimestamp);
+            this.renderTime = Math.min(this.renderTime, this.latestSnapshotInputTimestamp);
 
             let laterIdx = 0;
             for (; laterIdx < this.snapshotBuffer.length; ++laterIdx) {
                 const snapshot = this.snapshotBuffer[laterIdx];
-                console.log("Render time:", this.renderTime, "Snapshot time:", snapshot.timestamp);
-                if (snapshot.timestamp >= this.renderTime) {
+                if (snapshot.latestClientInputTimestamp >= this.renderTime) {
                     break;
                 }
             }
 
             const later = this.snapshotBuffer[laterIdx];
-
-            console.log(later);
-
             const earlier = laterIdx > 0
                 ? this.snapshotBuffer[laterIdx - 1]
                 : later;
 
-            this.snapshotBuffer = this.snapshotBuffer.filter(s => s.timestamp >= earlier.timestamp);
+            this.snapshotBuffer = this.snapshotBuffer.filter(s => s.latestClientInputTimestamp >= earlier.latestClientInputTimestamp);
 
-            const timeBetweenSnapshots = later.timestamp - earlier.timestamp;
-            const timeFromEarlier = this.renderTime - earlier.timestamp;
+            const timeBetweenSnapshots = later.latestClientInputTimestamp - earlier.latestClientInputTimestamp;
+            const timeFromEarlier = this.renderTime - earlier.latestClientInputTimestamp;
             const interpolationFactor = timeBetweenSnapshots > 0
                 ? timeFromEarlier / timeBetweenSnapshots
                 : 0;
@@ -333,8 +332,15 @@ export class Game implements Game {
                 if (typeof packet.message !== "string" || typeof packet.senderId !== "number") {
                     return;
                 }
+
+                const player = this.entities.get(packet.senderId);
+
+                if (!player) {
+                    return;
+                }
+
                 this.messageInChatbox(packet.message, packet.senderId);
-                newChatBubble(this.ui, packet.senderId, packet.message);
+                newChatBubble(this.ui, player, packet.message);
                 return;
             }
             case "DELETE_PLAYER": {
@@ -368,7 +374,7 @@ export class Game implements Game {
                 this.latestSnapshotTimestamp = snapshot.timestamp;
 
                 if (this.firstSnapshot) {
-                    this.renderTime = snapshot.timestamp;
+                    this.renderTime = snapshot.latestClientInputTimestamp;
                     this.firstSnapshot = false;
                 }
 
@@ -405,7 +411,7 @@ export class Game implements Game {
         const messageDiv = document.createElement("div");
         messageDiv.className = "chatbox-message";
 
-        if (senderId) {
+        if (typeof senderId === "number") {
             const sender = this.entities.get(senderId);
 
             if (sender) {
