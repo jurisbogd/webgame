@@ -74,8 +74,8 @@ function renderInternal(draw: Draw) {
     const yPosition = draw.top - viewport.top;
     const scaledXPosition = Math.floor(xPosition * renderScale);
     const scaledYPosition = Math.floor(yPosition * renderScale);
-    const scaledWidth = Math.floor(draw.transform.w * renderScale);
-    const scaledHeight = Math.floor(draw.transform.h * renderScale);
+    const scaledWidth = Math.floor(draw.transform.w * renderScale + 1);
+    const scaledHeight = Math.floor(draw.transform.h * renderScale + 1);
 
     canvasRenderingContext2d.globalAlpha = draw.alpha;
     canvasRenderingContext2d.drawImage(

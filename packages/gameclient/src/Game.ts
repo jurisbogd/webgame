@@ -253,7 +253,7 @@ export class Game implements Game {
                     ep = earlier.players[eidx];
                 }
 
-                if (ep?.networkId === lp.networkId) {
+                if (ep?.networkId === lp.networkId && ep?.room === lp.room) {
                     const position = lp.position
                         .subtract(ep.position)
                         .multiply(interpolationFactor)
