@@ -7,13 +7,17 @@ import { deleteSession, getSessionUser, getTokenSessionId, loginUser, registerUs
 import type { Request, Response } from "express";
 import cookieParser from "cookie-parser";
 
+if (!process.env.DATABASE_URL) {
+    throw new Error("Must provide database url");
+}
+
 const SESSION_COOKIE_NAME = "session";
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server: server });
 const gameServer = new GameServer();
 
-wss.on("connection", (ws, req) => {
+wss.on("connection", async (ws, req) => {
     if (req.url !== "/gameserver") {
         ws.close();
         return;
@@ -28,8 +32,8 @@ wss.on("connection", (ws, req) => {
     if (cookieHeader) {
         const token = parseCookies(cookieHeader);
         console.log(token);
-        const sessionId = getTokenSessionId(token);
-        const user = getSessionUser(sessionId);
+        const sessionId = await getTokenSessionId(token);
+        const user = await getSessionUser(sessionId);
 
         if (user) {
             username = user.username;
@@ -92,7 +96,7 @@ export function deleteSessionCookie(res: Response): void {
     });
 }
 
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
     const username = typeof req.body.username === "string"
         ? req.body.username.trim()
         : "";
@@ -101,7 +105,7 @@ app.post("/register", (req, res) => {
         ? req.body.password
         : "";
 
-    const registerResult = registerUser(username, password);
+    const registerResult = await registerUser(username, password);
 
     if (registerResult.success) {
         const session = registerResult.value;
@@ -118,7 +122,7 @@ app.post("/register", (req, res) => {
     }
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
     const username = typeof req.body.username === "string"
         ? req.body.username.trim()
         : "";
@@ -127,7 +131,7 @@ app.post("/login", (req, res) => {
         ? req.body.password
         : "";
 
-    const loginResult = loginUser(username, password);
+    const loginResult = await loginUser(username, password);
 
     if (loginResult.success) {
         const session = loginResult.value;
@@ -144,7 +148,7 @@ app.post("/login", (req, res) => {
     }
 });
 
-app.post("/logout", (req, res) => {
+app.post("/logout", async (req, res) => {
     const token = getSessionToken(req);
 
     if (!token) {
@@ -153,7 +157,7 @@ app.post("/logout", (req, res) => {
         });
     }
 
-    const sessionId = getTokenSessionId(token);
+    const sessionId = await getTokenSessionId(token);
     deleteSession(sessionId);
 
     deleteSessionCookie(res);
@@ -162,7 +166,7 @@ app.post("/logout", (req, res) => {
     });
 });
 
-app.get("/status", (req, res) => {
+app.get("/status", async (req, res) => {
     const token = getSessionToken(req);
 
     if (!token) {
@@ -171,7 +175,7 @@ app.get("/status", (req, res) => {
         });
     }
 
-    const sessionId = getTokenSessionId(token);
+    const sessionId = await getTokenSessionId(token);
     const user = getSessionUser(sessionId);
 
     if (user) {
@@ -190,85 +194,8 @@ app.get("/status", (req, res) => {
 });
 
 gameServer.start();
-server.listen(8000, () => {
-    console.log("Site and server listening on port 8000");
+
+const port = Number(process.env.PORT) ?? 8080;
+server.listen(port, "0.0.0.0", () => {
+    console.log(`Site and server listening on ${port}`);
 });
-
-// app.use(express.json());
-
-// const clientDist = getClientDist();
-
-// app.use(express.static(clientDist));
-// app.use("/assets", express.static("../../assets"))
-
-// app.use((err: unknown, req: any, res: any, next: any) => {
-//     if (err instanceof SyntaxError && "status" in err && (err as any).type === "entity.parse.failed") {
-//         return res.status(400).json({
-//             error: "Invalid JSON body"
-//         });
-//     }
-
-//     console.error("Unhandled error:", err);
-
-//     return res.status(500).json({
-//         error: "Internal server error"
-//     });
-// });
-
-// type HttpMethod =
-//     | "POST"
-//     | "GET";
-
-// async function callDbServer(route: string, method: HttpMethod, body: any) {
-//     return fetch(dbserverUrl + route, {
-//         method: method,
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(body)
-//     });
-// }
-
-// app.post("/register", async (req, res) => {
-//     try {
-//         const username = req.body.username;
-//         const password = req.body.password;
-
-//         const upstream = await callDbServer("/register", "POST", {
-//             username: username,
-//             password: password,
-//         });
-
-//         const data = await upstream.json();
-//         return res.status(upstream.status).json(data);
-//     } catch (err) {
-//         console.error(err);
-
-//         return res.status(500).json({
-//             error: ["Internal server error"]
-//         });
-//     }
-// });
-
-// app.post("/login", async (req, res) => {
-//     try {
-//         const username = req.body.username;
-//         const password = req.body.password;
-
-//         const upstream = await callDbServer("/register", "POST", {
-//             username: username,
-//             password: password,
-//         });
-
-//         const data = await upstream.json();
-//         return res.status(upstream.status).json(data);
-//     } catch (err) {
-//         console.error(err);
-
-//         return res.status(500).json({
-//             error: ["Internal server error"]
-//         });
-//     }
-// });
-
-// const server = app.listen(8000)

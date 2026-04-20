@@ -1,12 +1,20 @@
 import Database, { Statement } from "better-sqlite3";
+import { Pool } from "pg";
+
+export const pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    max: Number(process.env.PGPOOL_MAX || 5),
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000,
+});
 
 const db = new Database("game.db");
 
-db.exec(`
+await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL
-    ) STRICT;
+    );
 `);
 
 type Result<T> =
@@ -33,10 +41,7 @@ export interface User {
     password: string,
 }
 
-const getUserQuery = "SELECT username, password FROM users WHERE username = ?";
-const getUserStatement: Statement<[string], User> = db.prepare(getUserQuery);
-
-export function loginUser(username: string, password: string): Result<Session> {
+export async function loginUser(username: string, password: string): Promise<Result<Session>> {
     username = username.trim();
 
     if (
@@ -51,13 +56,13 @@ export function loginUser(username: string, password: string): Result<Session> {
         }
     }
 
-    const userResult = getUser(username);
+    const userResult = await getUser(username);
 
     if (userResult.success) {
         const user = userResult.value;
 
         if (user.password === password) {
-            const sessionResult = createSession(username);
+            const sessionResult = await createSession(username);
 
             if (sessionResult.success) {
                 return {
@@ -92,10 +97,7 @@ export function loginUser(username: string, password: string): Result<Session> {
     }
 }
 
-const insertUserQuery = "INSERT INTO users(username, password) VALUES(?, ?)";
-const insertUserStatement: Statement<[string, string], void> = db.prepare(insertUserQuery);
-
-export function registerUser(username: string, password: string): Result<Session> {
+export async function registerUser(username: string, password: string): Promise<Result<Session>> {
     username = username.trim();
 
     const error: string[] = [];
@@ -125,10 +127,10 @@ export function registerUser(username: string, password: string): Result<Session
         }
     }
 
-    const insertUserResult = insertUser(username, password);
+    const insertUserResult = await insertUser(username, password);
 
     if (insertUserResult.success) {
-        const sessionResult = createSession(username);
+        const sessionResult = await createSession(username);
 
         if (sessionResult.success) {
             return {
@@ -160,7 +162,7 @@ export function registerUser(username: string, password: string): Result<Session
 
 const sessionExpiresInSeconds = 60 * 60 * 24; // 1 day
 
-function createSession(username: string): { success: false, error: string } | { success: true, value: Session } {
+async function createSession(username: string): Promise<{ success: false, error: string } | { success: true, value: Session }> {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + sessionExpiresInSeconds);
 
@@ -170,8 +172,8 @@ function createSession(username: string): { success: false, error: string } | { 
     }
 }
 
-export function checkSession(token: string) {
-    const userResult = getUser(token);
+export async function checkSession(token: string) {
+    const userResult = await getUser(token);
 
     if (userResult.success) {
         return {
@@ -187,9 +189,12 @@ export function checkSession(token: string) {
     }
 }
 
-function insertUser(username: string, password: string) {
+async function insertUser(username: string, password: string) {
     try {
-        insertUserStatement.run(username, password);
+        await pool.query(
+            "INSERT INTO users(username, password) VALUES(%1, %2)",
+            [username, password],
+        );
 
         return {
             success: true,
@@ -214,9 +219,14 @@ function insertUser(username: string, password: string) {
     }
 }
 
-function getUser(username: string): { success: false, error: string } | { success: true, value: User } {
+async function getUser(username: string): Promise<{ success: false, error: string } | { success: true, value: User }> {
     try {
-        const user = getUserStatement.get(username);
+        const { rows } = await pool.query(
+            'select * from users where email = $1',
+            [username]
+        );
+
+        const user = rows[0];
 
         if (!user) {
             return {
@@ -241,12 +251,12 @@ function getUser(username: string): { success: false, error: string } | { succes
     }
 }
 
-export function getTokenSessionId(token: string) {
+export async function getTokenSessionId(token: string) {
     return token;
 }
 
-export function getSessionUser(sessionId: string) {
-    const getUserResult = getUser(sessionId);
+export async function getSessionUser(sessionId: string) {
+    const getUserResult = await getUser(sessionId);
 
     if (getUserResult.success) {
         const user = getUserResult.value;
@@ -260,6 +270,6 @@ export function getSessionUser(sessionId: string) {
     }
 }
 
-export function deleteSession(token: string) {
+export async function deleteSession(token: string) {
     // do nothing for now  
 }
