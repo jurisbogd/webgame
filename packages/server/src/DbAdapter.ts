@@ -1,5 +1,4 @@
 import Database, { Statement } from "better-sqlite3";
-import { } from "bcrypt";
 
 const db = new Database("game.db");
 
