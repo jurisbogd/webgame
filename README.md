@@ -4,10 +4,6 @@
 
 2. `npm run build`
 
-### Svetainės paleidimas
+### Svetainės paleidimas ir žaidimo serverio paleidimas
 
-`npm run start:httpserver`
-
-### Žaidimo serverio paleidimas
-
-`npm run start:gameserver`
+`npm run start:combserver`
