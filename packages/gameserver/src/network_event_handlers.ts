@@ -42,6 +42,9 @@ export const network_event_handlers = {
             room_id: room.id,
         };
 
+        const player = game.players.get(sender_id);
+        player.room = room.id;
+
         game.packet_to_send.events.push(set_player_room_event);
 
         const sender = game.players.get(sender_id);
