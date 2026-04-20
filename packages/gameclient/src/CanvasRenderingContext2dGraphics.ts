@@ -77,6 +77,7 @@ function renderInternal(draw: Draw) {
     const scaledWidth = draw.transform.w * renderScale;
     const scaledHeight = draw.transform.h * renderScale;
 
+    canvasRenderingContext2d.globalAlpha = draw.alpha;
     canvasRenderingContext2d.drawImage(
         draw.image,
         draw.spriteRect.x,

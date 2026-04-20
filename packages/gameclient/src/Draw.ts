@@ -67,6 +67,7 @@ export class Draw implements IRect {
     transform;
     spriteRect;
     depth = 0;
+    alpha = 1;
 
     constructor(image: any, transform: Rect, sprite_rect: Rect, pivot: Vec2) {
         this.image = image;

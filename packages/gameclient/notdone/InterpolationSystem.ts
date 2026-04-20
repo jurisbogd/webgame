@@ -1,187 +1,169 @@
-import { Vec2 } from "@jbwg/shared/math";
-import { PlayerSnapshot } from "./PlayerSnapshot";
-import { ServerSnapshot } from "./ServerSnapshot";
+// import { Vec2 } from "@jbwg/shared/math";
+// import { SnapshotPacket, PlayerSnapshot } from "@jbwg/shared/game";
 
-let resolveInterpSystem: (() => void) | undefined;
-const snapshots: ServerSnapshot[] = [];
-const bufferTimeMs = 100;
-const dtMultiplierAmount = 0.1;
-let renderTime = 0;
+// const snapshots: SnapshotPacket[] = [];
+// const bufferTargetTimeMs = 100;
+// const dtMultiplierAmount = 0.1;
 
-export function pushServerSnapshot(packet: ServerSnapshot) {
-    snapshots.push(packet);
+// export function processSnapshots(
+//     dt: number,
+//     renderTime: number,
+// ) {
+//     // do not interpolate if no snapshots
+//     if (snapshots.length < 0) {
+//         throw new Error("Cannot process snapshots, no snapshots available")
+//     };
 
-    if (hasEnoughTimeBuffered() && resolveInterpSystem) {
-        renderTime = snapshots[0].timestamp;
-        resolveInterpSystem();
-    };
-};
+//     const latest = snapshots[snapshots.length - 1];
 
-export function initInterpolationSystem() {
-    return new Promise<void>(
-        (resolve) => {
-            resolveInterpSystem = resolve;
-        },
-    );
-};
+//     const latestTime = latest.timestamp;
+//     renderTime = stepRenderTime(latestTime, dt);
 
-export function processSnapshots(
-    dt: number,
-) {
-    // do not interpolate if no snapshots
-    if (snapshots.length < 0) {
-        throw new Error("Cannot process snapshots, no snapshots available")
-    };
+//     const [earlier, later] = getInterpSnaps();
 
-    const latest = snapshots[snapshots.length - 1];
+//     while (snapshots[0].timestamp < earlier.timestamp) {
+//         snapshots.shift();
+//     };
 
-    const latestTime = latest.timestamp;
-    renderTime = stepRenderTime(latestTime, dt);
+//     const interpolated = interpolate(earlier, later);
 
-    const [earlier, later] = getInterpSnaps();
+//     return { renderTime, latest, interpolated };
+// };
 
-    while (snapshots[0].timestamp < earlier.timestamp) {
-        snapshots.shift();
-    };
+// function hasEnoughTimeBuffered() {
+//     if (snapshots.length === 0) {
+//         return false;
+//     };
 
-    const interpolated = interpolate(earlier, later);
+//     const first = snapshots[0];
+//     const latest = snapshots[snapshots.length - 1];
+//     const timeBetween = latest.timestamp - first.timestamp;
+//     const timeBetweenMs = gameTimeToMs(timeBetween);
 
-    return { latest, interpolated };
-};
+//     return timeBetweenMs > bufferTargetTimeMs;
+// };
 
-function hasEnoughTimeBuffered() {
-    if (snapshots.length === 0) {
-        return false;
-    };
+// function getInterpSnaps() {
+//     // expect snapshot buffer to have snapshots
+//     if (snapshots.length === 0) {
+//         throw new Error("Cannot find snapshots for interpolation, snapshot buffer is empty");
+//     };
 
-    const first = snapshots[0];
-    const latest = snapshots[snapshots.length - 1];
-    const timeBetween = latest.timestamp - first.timestamp;
-    const timeBetweenMs = gameTimeToMs(timeBetween);
+//     // find later, then take one before for earlier
+//     for (let i = 0; i < snapshots.length; ++i) {
+//         const snapshot = snapshots[i];
 
-    return timeBetweenMs > bufferTimeMs;
-};
+//         if (snapshot.timestamp > renderTime) {
+//             // if one before does not exist, use later for both
+//             const earlier = i > 0
+//                 ? snapshots[i - 1]
+//                 : snapshot;
 
-function getInterpSnaps() {
-    // expect snapshot buffer to have snapshots
-    if (snapshots.length === 0) {
-        throw new Error("Cannot find snapshots for interpolation, snapshot buffer is empty");
-    };
+//             return [earlier, snapshot]
+//         };
+//     };
 
-    // find later, then take one before for earlier
-    for (let i = 0; i < snapshots.length; ++i) {
-        const snapshot = snapshots[i];
+//     // if later was not found, use latest for both
+//     const snapshot = snapshots[snapshots.length - 1];
 
-        if (snapshot.timestamp > renderTime) {
-            // if one before does not exist, use later for both
-            const earlier = i > 0
-                ? snapshots[i - 1]
-                : snapshot;
+//     return [snapshot, snapshot];
+// };
 
-            return [earlier, snapshot]
-        };
-    };
+// function stepRenderTime(
+//     latestSnapshotTime: number,
+//     dt: number,
+// ): number {
+//     const delayMs = gameTimeToMs(latestSnapshotTime - renderTime);
 
-    // if later was not found, use latest for both
-    const snapshot = snapshots[snapshots.length - 1];
+//     // Run slower if ahead of server, faster if behind server
+//     const dtMultiplier = delayMs > bufferTargetTimeMs
+//         ? dtMultiplierAmount
+//         : -dtMultiplierAmount;
 
-    return [snapshot, snapshot];
-};
+//     return renderTime + (dt * dtMultiplier);
+// };
 
-function stepRenderTime(
-    latestSnapshotTime: number,
-    dt: number,
-): number {
-    const delayMs = gameTimeToMs(latestSnapshotTime - renderTime);
+// function gameTimeToMs(gameTime: number) {
+//     return gameTime * 1000;
+// };
 
-    // Run slower if ahead of server, faster if behind server
-    const dtMultiplier = delayMs > bufferTimeMs
-        ? dtMultiplierAmount
-        : -dtMultiplierAmount;
+// function interpolate(
+//     earlier: SnapshotPacket,
+//     later: SnapshotPacket,
+// ) {
+//     const interpolatedSnapshot: SnapshotPacket = {
+//         tag: "SNAPSHOT",
+//         timestamp: 0,
+//         latestClientInputTimestamp: 0,
+//         players: [],
+//     };
 
-    return renderTime + (dt * dtMultiplier);
-};
+//     const dtFromEarlier = renderTime - earlier.timestamp;
+//     const timeBetween = later.timestamp - earlier.timestamp;
+//     const interpolationAmount = clampNumber(dtFromEarlier / timeBetween, 0, 1);
 
-function gameTimeToMs(gameTime: number) {
-    return gameTime * 1000;
-};
+//     let earlierPlayerIndex = 0;
+//     for (const laterPlayer of later.players) {
+//         let earlierPlayer = earlier.players[earlierPlayerIndex];
+//         while (earlierPlayer.networkId < laterPlayer.networkId) {
+//             earlierPlayer = earlier.players[++earlierPlayerIndex];
+//         };
 
-function interpolate(
-    earlier: ServerSnapshot,
-    later: ServerSnapshot,
-) {
-    const interpolatedSnapshot: ServerSnapshot = {
-        timestamp: 0,
-        latestClientTime: 0,
-        players: [],
-    };
+//         if (earlierPlayer.networkId === laterPlayer.networkId) {
+//             const interpolatedPlayer = interpolatePlayerSnapshot(
+//                 earlierPlayer,
+//                 laterPlayer,
+//                 interpolationAmount,
+//             );
 
-    const dtFromEarlier = renderTime - earlier.timestamp;
-    const timeBetween = later.timestamp - earlier.timestamp;
-    const interpolationAmount = clampNumber(dtFromEarlier / timeBetween, 0, 1);
+//             interpolatedSnapshot.players.push(interpolatedPlayer);
+//         }
+//         else {
+//             interpolatedSnapshot.players.push(laterPlayer);
+//         };
+//     };
 
-    let earlierPlayerIndex = 0;
-    for (const laterPlayer of later.players) {
-        let earlierPlayer = earlier.players[earlierPlayerIndex];
-        while (earlierPlayer.networkId < laterPlayer.networkId) {
-            earlierPlayer = earlier.players[++earlierPlayerIndex];
-        };
+//     return interpolatedSnapshot;
+// };
 
-        if (earlierPlayer.networkId === laterPlayer.networkId) {
-            const interpolatedPlayer = interpolatePlayerSnapshot(
-                earlierPlayer,
-                laterPlayer,
-                interpolationAmount,
-            );
+// function interpolatePlayerSnapshot(
+//     earlier: PlayerSnapshot,
+//     later: PlayerSnapshot,
+//     t: number,
+// ): PlayerSnapshot {
+//     const position = lerpVec2(earlier.position, later.position, t);
+//     const velocity = lerpVec2(earlier.velocity, later.velocity, t);
 
-            interpolatedSnapshot.players.push(interpolatedPlayer);
-        }
-        else {
-            interpolatedSnapshot.players.push(laterPlayer);
-        };
-    };
+//     return {
+//         position,
+//         velocity,
+//         networkId: later.networkId,
+//     };
+// };
 
-    return interpolatedSnapshot;
-};
+// function clampNumber(
+//     number: number,
+//     min: number,
+//     max: number
+// ) {
+//     return Math.min(max, Math.max(min, number));
+// };
 
-function interpolatePlayerSnapshot(
-    earlier: PlayerSnapshot,
-    later: PlayerSnapshot,
-    t: number,
-): PlayerSnapshot {
-    const position = lerpVec2(earlier.position, later.position, t);
-    const velocity = lerpVec2(earlier.velocity, later.velocity, t);
+// function lerpNumber(
+//     a: number,
+//     b: number,
+//     t: number
+// ) {
+//     return ((b - a) * t) + a;
+// };
 
-    return {
-        position,
-        velocity,
-        networkId: later.networkId,
-    };
-};
-
-function clampNumber(
-    number: number,
-    min: number,
-    max: number
-) {
-    return Math.min(max, Math.max(min, number));
-};
-
-function lerpNumber(
-    a: number,
-    b: number,
-    t: number
-) {
-    return ((b - a) * t) + a;
-};
-
-function lerpVec2(
-    a: Vec2,
-    b: Vec2,
-    t: number
-) {
-    return new Vec2(
-        lerpNumber(a.x, b.x, t),
-        lerpNumber(a.y, b.y, t),
-    );
-};
+// function lerpVec2(
+//     a: Vec2,
+//     b: Vec2,
+//     t: number
+// ) {
+//     return new Vec2(
+//         lerpNumber(a.x, b.x, t),
+//         lerpNumber(a.y, b.y, t),
+//     );
+// };

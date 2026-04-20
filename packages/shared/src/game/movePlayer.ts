@@ -1,5 +1,33 @@
-import { Rect, Vec2 } from "@jbwg/shared/math"
-import { Room } from "./Room"
+import { Rect, Vec2 } from "../math.js";
+import { Room } from "./Room.js";
+
+export function movePlayer(playerPosition: Vec2, movementDirection: Vec2, room?: Room | undefined) {
+    if (movementDirection.x === 0 && movementDirection.y === 0) {
+        return { position: playerPosition, velocity: Vec2.zero };
+    }
+
+    const mag = Math.sqrt(movementDirection.x * movementDirection.x + movementDirection.y * movementDirection.y)
+    movementDirection = movementDirection.divide(mag);
+    const velocity = movementDirection.multiply(1.5);
+
+    const playerRect = new Rect(
+        playerPosition.x,
+        playerPosition.y,
+        14,
+        14,
+    );
+
+    if (room) {
+        const position = axisSeparatedCollisionTrace(playerRect, velocity, room);
+        return { position, velocity };
+    }
+    else {
+        return {
+            position: playerPosition.add(velocity),
+            velocity,
+        }
+    }
+}
 
 const tileSize = 16;
 

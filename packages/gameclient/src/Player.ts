@@ -1,34 +1,49 @@
 import { Rect, Vec2 } from '@jbwg/shared/math'
 import { KeyboardInput } from './KeyboardInput'
-import { Room, axisSeparatedCollisionTrace } from "@jbwg/shared/game";
+import { Room, movePlayer } from "@jbwg/shared/game";
 import { Player } from './Game';
 import { Game } from './Game';
 
-function playerInputProcess(player: Player) {
-    const speed = 1.5;
-    const movementDirection = KeyboardInput.movementDirection();
+// function playerInputProcess(player: Player) {
+//     const speed = 1.5;
+//     const movementDirection = KeyboardInput.movementDirection();
 
-    player.velocity = movementDirection.multiply(speed);
-};
+//     player.velocity = movementDirection.multiply(speed);
+// };
 
-function resolveCollisions(player: Player, room: Room) {
-    return axisSeparatedCollisionTrace(
-        new Rect(player.position.x, player.position.y, 14, 14),
-        player.velocity,
-        room,
-    );
-};
+// function resolveCollisions(player: Player, room: Room) {
+//     return axisSeparatedCollisionTrace(
+//         new Rect(player.position.x, player.position.y, 14, 14),
+//         player.velocity,
+//         room,
+//     );
+// };
 
 export function gameUpdatePlayer(game: Game) {
+    game.inputBuffer = game.inputBuffer.filter(i => i.timestamp > game.latestSnapshotInputTimestamp);
     const player = getYourPlayer(game);
 
-    if (player === undefined) return;
+    if (!player) return;
 
-    playerInputProcess(player)
+    if (game.lastFastForward < game.latestSnapshotInputTimestamp) {
+        player.position = player.latestPosition;
+        player.velocity = player.latestVelocity;
+        // fast forward inputs
+        for (const input of game.inputBuffer) {
+            const movementDirection = input.movementDirection;
 
-    player.position = game.room
-        ? resolveCollisions(player, game.room)
-        : player.position.add(player.velocity);
+            const { position, velocity } = movePlayer(player.position, movementDirection, game.room);
+            player.position = position;
+            player.velocity = velocity;
+        }
+        game.lastFastForward = game.latestSnapshotInputTimestamp;
+    }
+
+    const movementDirection = KeyboardInput.movementDirection();
+
+    const { position, velocity } = movePlayer(player.position, movementDirection, game.room);
+    player.position = position;
+    player.velocity = velocity;
 };
 
 export function getYourPlayer(game: Game) {

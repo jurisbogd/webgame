@@ -25,8 +25,8 @@ function render_player(game: Game, player: Player) {
         return;
     }
 
-    const position = player.latestPosition;
-    const velocity = player.latestVelocity;
+    const position = player.position;
+    const velocity = player.velocity;
 
     if (velocity.y > 0) player.lookDirection = 'down';
     else if (velocity.y < 0) player.lookDirection = 'up';

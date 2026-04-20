@@ -1,5 +1,5 @@
 import { Rect, Vec2 } from "@jbwg/shared/math";
-import { roomParser, Room, Tile, TileLayer, axisSeparatedCollisionTrace, ClientPacket } from "@jbwg/shared/game";
+import { roomParser, Room, Tile, TileLayer, movePlayer, ClientPacket } from "@jbwg/shared/game";
 import { WebSocket } from "ws";
 import { readFileSync } from "fs";
 import { parser } from "@jbwg/shared/parser";
@@ -309,49 +309,3 @@ export class GameServer {
         }
     }
 }
-
-function movePlayer(playerPosition: Vec2, movementDirection: Vec2, room: Room) {
-    if (movementDirection.x === 0 && movementDirection.y === 0) {
-        return { position: playerPosition, velocity: Vec2.zero };
-    }
-
-    const mag = Math.sqrt(movementDirection.x * movementDirection.x + movementDirection.y * movementDirection.y)
-    movementDirection = movementDirection.divide(mag);
-    const velocity = movementDirection.multiply(1.5);
-
-    const playerRect = new Rect(
-        playerPosition.x,
-        playerPosition.y,
-        14,
-        14,
-    );
-    const position = axisSeparatedCollisionTrace(playerRect, velocity, room);
-
-    console.log("Final position:", playerPosition);
-
-    return { position, velocity };
-}
-
-// function playerMovementProcess(player: Player, movementDirection: Vec2, room: Room) {
-//     if (movementDirection.x === 0 && movementDirection.y === 0) {
-//         player.velocity = Vec2.zero;
-//         return;
-//     }
-
-//     console.log("Trying to move player:", { position: player.position, networkId: player.networkId }, "Movement direction:", movementDirection);
-
-//     // normalize movement direction
-//     const mag = Math.sqrt(movementDirection.x * movementDirection.x + movementDirection.y * movementDirection.y)
-//     movementDirection = movementDirection.divide(mag);
-//     player.velocity = movementDirection.multiply(1.5);
-
-//     const playerRect = new Rect(
-//         player.position.x,
-//         player.position.y,
-//         14,
-//         14,
-//     );
-//     player.position = axisSeparatedCollisionTrace(playerRect, player.velocity, room);
-
-//     console.log("Final position:", player.position);
-// }

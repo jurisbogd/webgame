@@ -4,5 +4,5 @@ import { Player } from "./Game"
 export function viewportFollowPlayer(player: Player) {
     const viewport = getViewport();
 
-    viewport.position = player.latestPosition;
+    viewport.position = player.position;
 };

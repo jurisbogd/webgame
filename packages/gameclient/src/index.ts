@@ -9,6 +9,7 @@ import { Draw } from "./Draw";
 import { Vec2 } from '@jbwg/shared/math';
 import { renderTiled } from './render/renderTiled';
 import { Game } from './Game';
+import { ClientInputPacket } from '@jbwg/shared/game';
 
 function step(game: Game) {
     if (KeyboardInput.isPressed("enter")) {
@@ -23,15 +24,20 @@ function step(game: Game) {
     //         // queue_event({ tag: "SET_POSITION", position: player.position, velocity: player.velocity });
     //     };
     // };
+    gameUpdatePlayer(game);
 
     const movementDirection = KeyboardInput.movementDirection();
-    game.sendToServer({
+    const inputPacket: ClientInputPacket = {
         tag: "INPUT",
         movementDirection: movementDirection,
         timestamp: performance.now(),
-    });
+    }
+    game.sendToServer(inputPacket);
+    game.inputBuffer.push(inputPacket);
 
     clear();
+
+    game.interpolateSnapshots();
 
     {
         const player = getYourPlayer(game)

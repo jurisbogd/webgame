@@ -1,4 +1,4 @@
-import { InitPacket, PlayerAttributes, PlayerSnapshot, ClientPacket, Room, roomParser, ServerPacket, SnapshotPacket } from '@jbwg/shared/game';
+import { InitPacket, PlayerAttributes, PlayerSnapshot, ClientPacket, Room, roomParser, ServerPacket, SnapshotPacket, ClientInputPacket, movePlayer } from '@jbwg/shared/game';
 import { Vec2 } from '@jbwg/shared/math';
 import { initServer, Server } from './server';
 import { Spritesheet } from './Spritesheet';
@@ -6,26 +6,23 @@ import { initGraphics } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
 import { load_image, load_spritesheet } from './load_image';
 import { Parser, parser } from '@jbwg/shared/parser';
+import { getYourPlayer } from './Player';
+import { newChatBubble } from './render_chat_bubbles';
+import { ServerSnapshot } from './ServerSnapshot';
 
 export interface ChatMessage {
     message: string;
     timestamp: number;
 }
 
-type PlayerType =
-    | "other"
-    | "main";
-
 export interface Player {
     networkId: number;
     isGuest: boolean;
     name: string;
+    room?: string;
 
     animationTime: number;
     lookDirection: string;
-
-    interpolatedPosition: Vec2;
-    interpolatedVelocity: Vec2;
 
     latestPosition: Vec2;
     latestVelocity: Vec2;
@@ -38,9 +35,6 @@ export interface Player {
 export class Player implements Player {
     animationTime = 0;
     lookDirection = "down";
-
-    interpolatedPosition = Vec2.zero;
-    interpolatedVelocity = Vec2.zero;
 
     latestPosition = Vec2.zero;
     latestVelocity = Vec2.zero;
@@ -79,6 +73,8 @@ export interface Game {
     spritesheets: Record<string, Spritesheet<HTMLImageElement>>;
     tilesets: Record<string, HTMLImageElement>;
     backgrounds: Record<string, HTMLImageElement>;
+    latestSnapshotInputTimestamp: number;
+    lastFastForward: number;
 
     room?: Room;
 
@@ -92,6 +88,15 @@ export class Game implements Game {
     backgrounds: Record<string, HTMLImageElement> = {};
     cloudPosition = Vec2.zero;
     entities = new Map<number, Player>();
+    inputBuffer: ClientInputPacket[] = [];
+    latestSnapshotInputTimestamp: number = 0;
+    latestSnapshotTimestamp: number = 0;
+    lastFastForward: number = 0;
+    snapshotBuffer: SnapshotPacket[] = [];
+    renderTime: number = 0;
+
+    dtMod = 0;
+    firstSnapshot = true;
 
     constructor() {
         const canvas = document.getElementById('canvas-2d') as HTMLCanvasElement;
@@ -192,6 +197,103 @@ export class Game implements Game {
         return game;
     }
 
+    interpolateSnapshots() {
+        if (!this.firstSnapshot) {
+            const timeToLatest = this.latestSnapshotTimestamp - this.renderTime;
+
+            if (timeToLatest < 100) {
+                this.dtMod = -0.1;
+            }
+            else if (timeToLatest < 200) {
+                this.dtMod = -0.01;
+            }
+            else if (timeToLatest < 300 && timeToLatest > 250) {
+                this.dtMod = 0;
+            }
+            else if (timeToLatest >= 300) {
+                this.dtMod = 0.01;
+            }
+
+            const dt = 1000 / 60;
+
+            this.renderTime += dt + (dt * this.dtMod);
+            this.renderTime = Math.min(this.renderTime, this.latestSnapshotTimestamp);
+
+            let laterIdx = 0;
+            for (; laterIdx < this.snapshotBuffer.length; ++laterIdx) {
+                const snapshot = this.snapshotBuffer[laterIdx];
+                console.log("Render time:", this.renderTime, "Snapshot time:", snapshot.timestamp);
+                if (snapshot.timestamp >= this.renderTime) {
+                    break;
+                }
+            }
+
+            const later = this.snapshotBuffer[laterIdx];
+
+            console.log(later);
+
+            const earlier = laterIdx > 0
+                ? this.snapshotBuffer[laterIdx - 1]
+                : later;
+
+            this.snapshotBuffer = this.snapshotBuffer.filter(s => s.timestamp >= earlier.timestamp);
+
+            const timeBetweenSnapshots = later.timestamp - earlier.timestamp;
+            const timeFromEarlier = this.renderTime - earlier.timestamp;
+            const interpolationFactor = timeBetweenSnapshots > 0
+                ? timeFromEarlier / timeBetweenSnapshots
+                : 0;
+
+            const interpolatedPlayers: PlayerSnapshot[] = [];
+            let eidx = 0;
+            for (const lp of later.players) {
+                let ep = earlier.players[eidx];
+                while (ep?.networkId < lp.networkId && eidx < earlier.players.length) {
+                    ++eidx;
+                    ep = earlier.players[eidx];
+                }
+
+                if (ep?.networkId === lp.networkId) {
+                    const position = lp.position
+                        .subtract(ep.position)
+                        .multiply(interpolationFactor)
+                        .add(ep.position);
+                    const velocity = lp.velocity
+                        .subtract(ep.velocity)
+                        .multiply(interpolationFactor)
+                        .add(ep.velocity);
+
+                    const interpolatedPlayer: PlayerSnapshot = {
+                        networkId: lp.networkId,
+                        room: lp.room,
+                        position,
+                        velocity,
+                    }
+                    interpolatedPlayers.push(interpolatedPlayer)
+                }
+                else {
+                    interpolatedPlayers.push(lp);
+                }
+            }
+
+            for (const ip of interpolatedPlayers) {
+                if (ip.networkId === this.yourNetworkId) {
+                    continue;
+                }
+
+                const player = this.entities.get(ip.networkId);
+
+                if (!player) {
+                    continue;
+                }
+
+                player.position = ip.position;
+                player.velocity = ip.velocity;
+                player.room = ip.room;
+            }
+        }
+    }
+
     onServerPacket(packet: ServerPacket) {
         const tag = packet.tag;
         console.log(`Received packet with tag ${tag}`);
@@ -234,6 +336,7 @@ export class Game implements Game {
                     return;
                 }
                 this.messageInChatbox(packet.message, packet.senderId);
+                newChatBubble(this.ui, packet.senderId, packet.message);
                 return;
             }
             case "DELETE_PLAYER": {
@@ -262,6 +365,16 @@ export class Game implements Game {
                 }
 
                 const snapshot = snapshotResult.value;
+
+                this.latestSnapshotInputTimestamp = snapshot.latestClientInputTimestamp;
+                this.latestSnapshotTimestamp = snapshot.timestamp;
+
+                if (this.firstSnapshot) {
+                    this.renderTime = snapshot.timestamp;
+                    this.firstSnapshot = false;
+                }
+
+                this.snapshotBuffer.push(snapshot);
 
                 for (const playerSnapshot of snapshot.players) {
                     const player = this.entities.get(playerSnapshot.networkId);
