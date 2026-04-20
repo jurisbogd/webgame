@@ -14,24 +14,19 @@ export function render_players(game: Game) {
 }
 
 function render_player(game: Game, player: Player) {
-    // const player = get_player(game);
+    const yourPlayer = getYourPlayer(game);
 
-    if (!player) {
+    if (!yourPlayer) {
         console.log('no player');
         return;
     }
 
-    // if (player.room !== game.room.id) {
-    //     console.log('room id mismatch');
-    //     return;
-    // }
+    if (player.latestRoom !== yourPlayer.latestRoom) {
+        return;
+    }
 
-    const position = player.position;
-    // const previous_position = player.previous_position;
-
-    const velocity = player.velocity;
-
-    // if (position === undefined || previous_position === undefined) return;
+    const position = player.latestPosition;
+    const velocity = player.latestVelocity;
 
     if (velocity.y > 0) player.lookDirection = 'down';
     else if (velocity.y < 0) player.lookDirection = 'up';
@@ -54,9 +49,6 @@ function render_player(game: Game, player: Player) {
         player.animationTime = (player.animationTime + 1 / 60) % sheetAnimation.duration;
         const frameIdx = Math.floor(player.animationTime / sheetAnimation.duration * sheetAnimation.frames.length);
         frame = sheetAnimation.frames[frameIdx];
-
-        // frame = spritesheet.get_animation_frame(animation, player.animation_time);
-        // player.animation_time = spritesheet.step_animation_time(animation, player.animation_time);
     }
     else {
         if (player.lookDirection === 'right') frame = 'look_right';
@@ -69,10 +61,5 @@ function render_player(game: Game, player: Player) {
     const draw = drawSprite(spritesheet, frame, position);
     draw.depth = draw.bottom;
 
-    // const draw = Draw.sprite(spritesheet, frame, position.x, position.y)
-    // .set_depth_bottom();
-
     render(draw, true);
-
-    // game.graphics.render_buffered(draw);
 }

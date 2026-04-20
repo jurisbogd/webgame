@@ -1,4 +1,4 @@
-import { InitPacket, PlayerAttributes, PlayerSnapshot, PlayerState, Room, ServerPacket, SnapshotPacket } from '@jbwg/shared/game';
+import { InitPacket, PlayerAttributes, PlayerSnapshot, ClientPacket, Room, roomParser, ServerPacket, SnapshotPacket } from '@jbwg/shared/game';
 import { Vec2 } from '@jbwg/shared/math';
 import { initServer, Server } from './server';
 import { Spritesheet } from './Spritesheet';
@@ -52,6 +52,10 @@ export class Player implements Player {
     constructor(networkId: number, isGuest: boolean, name?: string) {
         this.networkId = networkId;
         this.isGuest = isGuest;
+
+        if (typeof name !== "string") {
+            name = undefined;
+        }
 
         name = name ?? isGuest
             ? `Player ${networkId}`
@@ -210,9 +214,19 @@ export class Game implements Game {
                     this.entities.set(player.networkId, player);
                 }
 
+                this.sendToServer({
+                    tag: "GOTO_ROOM",
+                })
+
                 return;
             }
             case "ROOM": {
+                const roomResult = roomParser(packet?.room);
+
+                if (roomResult.success) {
+                    this.room = roomResult.value;
+                }
+
                 return;
             }
             case "CHAT_MESSAGE": {
@@ -223,9 +237,21 @@ export class Game implements Game {
                 return;
             }
             case "DELETE_PLAYER": {
+                if (typeof packet.playerId !== "number") {
+                    return;
+                }
+                this.entities.delete(packet.playerId);
                 return;
             }
             case "NEW_PLAYER": {
+                if (typeof packet.networkId !== "number") {
+                    return;
+                }
+
+                const isGuest = !!packet.isGuest;
+                const player = new Player(packet.networkId, isGuest, packet.name);
+                this.entities.set(player.networkId, player);
+
                 return;
             }
             case "SNAPSHOT": {
@@ -322,26 +348,3 @@ const initPacketParser = parser.compose({
     yourIsGuest: parser.boolean,
     initPlayers: parser.array(playerAttributesParser),
 }) as Parser<InitPacket>;
-
-type ClientPacket =
-    | ClientInputPacket
-    | ClientMessagePacket;
-
-type ClientPacketTag =
-    | "CHAT_MESSAGE"
-    | "INPUT";
-
-interface ClientPacketBase {
-    tag: ClientPacketTag;
-}
-
-interface ClientMessagePacket {
-    tag: "CHAT_MESSAGE";
-    message: string;
-    isGlobal: boolean;
-}
-
-interface ClientInputPacket {
-    tag: "INPUT";
-    movementDirection: Vec2;
-}

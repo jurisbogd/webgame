@@ -1,5 +1,5 @@
 import { Rect, Vec2 } from "@jbwg/shared/math";
-import { roomParser, Room, Tile, TileLayer, axisSeparatedCollisionTrace } from "@jbwg/shared/game";
+import { roomParser, Room, Tile, TileLayer, axisSeparatedCollisionTrace, ClientPacket } from "@jbwg/shared/game";
 import { WebSocket } from "ws";
 import { readFileSync } from "fs";
 import { parser } from "@jbwg/shared/parser";
@@ -10,6 +10,7 @@ const timeStep = 1000 / 60; // 60 fps
 interface Player extends PlayerAttributes, PlayerState {
     ws: WebSocket;
     latestInputTimestamp: number;
+    realRoom?: Room;
 }
 
 function loadRoom(name: string): Result<Room> {
@@ -33,43 +34,11 @@ type Failure = {
     reason?: string[];
 }
 
-type ClientPacketTag =
-    | "INPUT"
-    | "GOTO_ROOM"
-    | "CHAT_MESSAGE";
-
-type ClientPacket =
-    | ClientInputPacket
-    | ClientMessagePacket
-    | GotoRoomPacket;
-
-type ClientPacketWithSender = ClientPacket & { sender: number };
-
-interface ClientInputPacket extends ClientPacketBase {
-    tag: "INPUT";
-    movementDirection: Vec2;
-    timestamp: number;
-}
-
-interface ClientMessagePacket extends ClientPacketBase {
-    tag: "CHAT_MESSAGE";
-    message: string;
-    isGlobal?: boolean;
-}
-
-interface ClientPacketBase {
-    tag: ClientPacketTag;
-}
-
-interface GotoRoomPacket extends ClientPacketBase {
-    tag: "GOTO_ROOM";
-    room?: string;
-    door?: string;
-}
-
 function sendToWs(ws: WebSocket, packet: ServerPacket) {
     ws.send(JSON.stringify(packet));
 }
+
+type ClientPacketWithSender = ClientPacket & { sender: number };
 
 export class GameServer {
     rooms = new Map<string, Room>();
@@ -95,7 +64,6 @@ export class GameServer {
         });
 
         ws.addEventListener("message", (event) => {
-            console.log("Received message from client", event.data);
             const packet = JSON.parse(event.data as string);
             packet.tag = typeof packet.tag === "string"
                 ? packet.tag
@@ -121,14 +89,14 @@ export class GameServer {
 
     handlePacket(packet: ClientPacketWithSender) {
         const tag = packet.tag;
-        console.log(`Received packet with tag ${tag}:`, packet)
         switch (tag) {
             case "GOTO_ROOM": {
                 const senderId = packet.sender;
                 const sender = this.players.get(senderId);
-                const defaultRoom = "bigMap";
-                const roomName = typeof packet.room === "string"
-                    ? packet.room ?? defaultRoom
+                const defaultRoom: string = "bigMap";
+                let roomName = packet.room ?? defaultRoom
+                roomName = typeof roomName === "string"
+                    ? roomName
                     : "";
                 const doorId = typeof packet.door === "string"
                     ? packet.door
@@ -149,6 +117,7 @@ export class GameServer {
                     });
 
                     sender.room = roomName;
+                    sender.realRoom = room;
                     sender.velocity = Vec2.zero;
 
                     if (doorId) {
@@ -171,7 +140,6 @@ export class GameServer {
                 break;
             }
             case "CHAT_MESSAGE": {
-                console.log("Handling chat message");
                 const senderId = packet.sender;
                 const isGlobal = !!packet.isGlobal;
                 const message = typeof packet.message === "string"
@@ -179,7 +147,6 @@ export class GameServer {
                     : "";
 
                 if (message) {
-                    console.log("Sending chat message to all clients");
                     this.sendToAll({
                         tag: "CHAT_MESSAGE",
                         senderId: senderId,
@@ -194,11 +161,14 @@ export class GameServer {
                 const movementDirectionResult = parser.vec2(packet.movementDirection);
 
                 if (movementDirectionResult.success) {
+                    const movementDirection = movementDirectionResult.value;
                     const sender = this.players.get(packet.sender);
-                    const roomResult = this.getRoom(sender?.room ?? "");
+                    const room = sender?.realRoom;
 
-                    if (sender && roomResult.success) {
-                        playerMovementProcess(sender, movementDirectionResult.value, roomResult.value);
+                    if (sender && room) {
+                        const { position, velocity } = movePlayer(sender.position, movementDirection, room);
+                        sender.position = position;
+                        sender.velocity = velocity;
 
                         const inputTimestamp = typeof packet.timestamp === "number"
                             ? packet.timestamp
@@ -208,6 +178,9 @@ export class GameServer {
                             sender.latestInputTimestamp = inputTimestamp;
                         }
                     }
+                }
+                else {
+                    console.error("Failed to parse movement direction:", movementDirectionResult.reason);
                 }
 
                 break;
@@ -337,17 +310,48 @@ export class GameServer {
     }
 }
 
-function playerMovementProcess(player: Player, movementDirection: Vec2, room: Room) {
-    // normalize movement direction
+function movePlayer(playerPosition: Vec2, movementDirection: Vec2, room: Room) {
+    if (movementDirection.x === 0 && movementDirection.y === 0) {
+        return { position: playerPosition, velocity: Vec2.zero };
+    }
+
     const mag = Math.sqrt(movementDirection.x * movementDirection.x + movementDirection.y * movementDirection.y)
     movementDirection = movementDirection.divide(mag);
+    const velocity = movementDirection.multiply(1.5);
 
     const playerRect = new Rect(
-        player.position.x,
-        player.position.y,
+        playerPosition.x,
+        playerPosition.y,
         14,
         14,
     );
-    const velocity = movementDirection.multiply(1.5);
-    player.position = axisSeparatedCollisionTrace(playerRect, velocity, room);
+    const position = axisSeparatedCollisionTrace(playerRect, velocity, room);
+
+    console.log("Final position:", playerPosition);
+
+    return { position, velocity };
 }
+
+// function playerMovementProcess(player: Player, movementDirection: Vec2, room: Room) {
+//     if (movementDirection.x === 0 && movementDirection.y === 0) {
+//         player.velocity = Vec2.zero;
+//         return;
+//     }
+
+//     console.log("Trying to move player:", { position: player.position, networkId: player.networkId }, "Movement direction:", movementDirection);
+
+//     // normalize movement direction
+//     const mag = Math.sqrt(movementDirection.x * movementDirection.x + movementDirection.y * movementDirection.y)
+//     movementDirection = movementDirection.divide(mag);
+//     player.velocity = movementDirection.multiply(1.5);
+
+//     const playerRect = new Rect(
+//         player.position.x,
+//         player.position.y,
+//         14,
+//         14,
+//     );
+//     player.position = axisSeparatedCollisionTrace(playerRect, player.velocity, room);
+
+//     console.log("Final position:", player.position);
+// }
