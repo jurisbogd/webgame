@@ -4,11 +4,9 @@ import { initServer, Server } from './server';
 import { Spritesheet } from './Spritesheet';
 import { initGraphics } from './CanvasRenderingContext2dGraphics';
 import { KeyboardInput } from './KeyboardInput';
-import { load_image, load_spritesheet } from './load_image';
+import { loadImage, loadSpritesheet } from './load_image';
 import { Parser, parser } from '@jbwg/shared/parser';
-import { getYourPlayer } from './Player';
-import { newChatBubble } from './render_chat_bubbles';
-import { ServerSnapshot } from './ServerSnapshot';
+import { newChatBubble } from './renderChatBubbles';
 
 export interface ChatMessage {
     message: string;
@@ -173,7 +171,7 @@ export class Game implements Game {
         game.server = server;
 
         for (const spritesheetName of ["tileset_basic", "player_base", "player_basic_demo", "doors"]) {
-            const spritesheet = await load_spritesheet(spritesheetName);
+            const spritesheet = await loadSpritesheet(spritesheetName);
 
             if (spritesheet !== undefined) {
                 game.spritesheets[spritesheetName] = spritesheet;
@@ -181,14 +179,14 @@ export class Game implements Game {
         }
 
         for (const tilesetName of ["greek_features", "greek_floors"]) {
-            const tileset = await load_image(tilesetName);
+            const tileset = await loadImage(tilesetName);
             if (tileset) {
                 game.tilesets[tilesetName] = tileset;
             }
         }
 
         for (const backgroundName of ["blue_sky", "clouds"]) {
-            const background = await load_image(backgroundName);
+            const background = await loadImage(backgroundName);
             if (background) {
                 game.backgrounds[backgroundName] = background;
             }

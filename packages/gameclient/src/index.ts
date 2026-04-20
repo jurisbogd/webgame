@@ -1,4 +1,4 @@
-import { renderChatBubbles } from './render_chat_bubbles';
+import { renderChatBubbles } from './renderChatBubbles';
 import { gameUpdatePlayer, getYourPlayer } from './Player';
 import { render_players } from './render/render_player';
 import { clear, flushDrawBuffer, getViewport, initGraphics, render } from './CanvasRenderingContext2dGraphics';
