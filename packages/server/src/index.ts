@@ -190,7 +190,7 @@ app.get("/status", (req, res) => {
 });
 
 gameServer.start();
-server.listen(8000, () => {
+server.listen(Number(process.env.PORT && 8080), "0.0.0.0", () => {
     console.log("Site and server listening on port 8000");
 });
 
