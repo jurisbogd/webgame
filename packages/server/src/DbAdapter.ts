@@ -8,6 +8,20 @@ export const pool = new Pool({
     connectionTimeoutMillis: 10000,
 });
 
+export async function connectWithRetry(retries = 10) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            await pool.query("SELECT 1");
+            console.log("Database connected");
+            return;
+        } catch (err) {
+            console.error(`DB not ready, retry ${i + 1}/${retries}`);
+            await new Promise((r) => setTimeout(r, 3000));
+        }
+    }
+    throw new Error("Database connection failed after retries");
+}
+
 const db = new Database("game.db");
 
 await pool.query(`
@@ -192,7 +206,7 @@ export async function checkSession(token: string) {
 async function insertUser(username: string, password: string) {
     try {
         await pool.query(
-            "INSERT INTO users(username, password) VALUES(%1, %2)",
+            "INSERT INTO users(username, password) VALUES($1, $2)",
             [username, password],
         );
 
@@ -222,7 +236,7 @@ async function insertUser(username: string, password: string) {
 async function getUser(username: string): Promise<{ success: false, error: string } | { success: true, value: User }> {
     try {
         const { rows } = await pool.query(
-            'select * from users where email = $1',
+            'select * from users where username = $1',
             [username]
         );
 

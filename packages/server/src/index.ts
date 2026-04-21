@@ -3,7 +3,7 @@ import { getClientDist } from "./getClientDist.js";
 import http from "http";
 import { WebSocketServer } from "ws";
 import { GameServer } from "./GameServer.js";
-import { deleteSession, getSessionUser, getTokenSessionId, loginUser, registerUser } from "./DbAdapter.js";
+import { connectWithRetry, deleteSession, getSessionUser, getTokenSessionId, loginUser, registerUser } from "./DbAdapter.js";
 import type { Request, Response } from "express";
 import cookieParser from "cookie-parser";
 
@@ -176,7 +176,7 @@ app.get("/status", async (req, res) => {
     }
 
     const sessionId = await getTokenSessionId(token);
-    const user = getSessionUser(sessionId);
+    const user = await getSessionUser(sessionId);
 
     if (user) {
         return res.status(200).json({
@@ -196,6 +196,7 @@ app.get("/status", async (req, res) => {
 gameServer.start();
 
 const port = Number(process.env.PORT) ?? 8080;
-server.listen(port, "0.0.0.0", () => {
+server.listen(port, "0.0.0.0", async () => {
     console.log(`Site and server listening on ${port}`);
+    await connectWithRetry();
 });
