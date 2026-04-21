@@ -11,7 +11,7 @@ export const pool = new Pool({
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
+    host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}/.s.PGSQL.5432`,
     max: Number(process.env.PGPOOL_MAX || 5),
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
