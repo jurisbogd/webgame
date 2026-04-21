@@ -1,8 +1,17 @@
-import Database, { Statement } from "better-sqlite3";
 import { Pool } from "pg";
 
+// export const pool = new Pool({
+//     connectionString: process.env.DATABASE_URL,
+//     max: Number(process.env.PGPOOL_MAX || 5),
+//     idleTimeoutMillis: 30000,
+//     connectionTimeoutMillis: 10000,
+// });
+
 export const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    host: `/cloudsql/${process.env.INSTANCE_CONNECTION_NAME}`,
     max: Number(process.env.PGPOOL_MAX || 5),
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 10000,
@@ -21,8 +30,6 @@ export async function connectWithRetry(retries = 10) {
     }
     throw new Error("Database connection failed after retries");
 }
-
-const db = new Database("game.db");
 
 await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
